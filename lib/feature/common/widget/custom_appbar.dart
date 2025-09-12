@@ -1,0 +1,69 @@
+import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import '../managers/theme_view_model.dart';
+class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
+  final String? title;
+  final List<Widget>? actions;
+  final String? arrow;
+  final String? first;
+  final Color? containerColor;
+  final PreferredSizeWidget? bottom;
+
+  const CustomAppBar({
+    super.key,
+    this.title,
+    this.actions,
+    this.arrow,
+    this.first,
+    this.containerColor,
+    this.bottom,
+  });
+
+  @override
+  Size get preferredSize =>
+      Size.fromHeight(kToolbarHeight + (bottom?.preferredSize.height ?? 0));
+
+  @override
+  Widget build(BuildContext context) {
+    final isDark = context.select<ThemeViewModel, bool>((vm) => vm.isDark);
+
+    return AppBar(
+      automaticallyImplyLeading: false,
+      elevation: 0,
+      backgroundColor: containerColor ?? Theme.of(context).appBarTheme.backgroundColor,
+      bottom: bottom,
+      leading: arrow != null
+          ? GestureDetector(
+              onTap: () {
+                if (Navigator.of(context).canPop()) {
+                  Navigator.of(context).pop();
+                }
+              },
+              child: Padding(
+                padding: const EdgeInsets.all(19),
+                child: Image.asset(arrow!, width: 10, height: 13, color: Theme.of(context).colorScheme.inverseSurface,),
+              ),
+            )
+          : null,
+      title: title != null
+          ? Center(
+              child: Text(
+                title!,
+                style: TextStyle(
+                  color: Theme.of(context).colorScheme.inverseSurface,
+                  fontSize: 20,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            )
+          : null,
+      actions: [
+        ...?actions,
+        IconButton(
+          icon: Icon(isDark ? Icons.dark_mode : Icons.light_mode),
+          onPressed: () => context.read<ThemeViewModel>().toggleTheme(),
+        ),
+      ],
+    );
+  }
+}

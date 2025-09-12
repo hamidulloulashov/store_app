@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:store_app/core/dependencies.dart' show dependencies;
 import 'core/router/router.dart' as AppRouter;
+import 'core/utils/app_theme.dart';
+import 'feature/common/managers/theme_view_model.dart';
 void main() {
   runApp(
     MultiProvider(
@@ -17,9 +19,9 @@ class MyApp extends StatelessWidget {
     return MaterialApp.router(
       debugShowCheckedModeBanner: false,
       title: 'My Cooking App',
-      // theme: AppThemes.lightTheme,
-      // darkTheme: AppThemes.darkTheme,
-      // themeMode: context.watch<ThemeViewModel>().currentTheme,
+      theme: AppThemes.lightTheme,
+      darkTheme: AppThemes.darkTheme,
+      themeMode: context.watch<ThemeViewModel>().currentTheme,
       routerConfig: AppRouter.router,
       
     );

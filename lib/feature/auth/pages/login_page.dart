@@ -1,49 +1,40 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
+import 'package:store_app/core/utils/app_colors.dart';
 import 'package:store_app/feature/common/widget/custom_appbar.dart';
-import '../managers/register_view_model.dart';
+import '../managers/login_view_model.dart';
 import '../widgets/register_widget.dart.dart';
 
-class RegisterPage extends StatefulWidget {
-  const RegisterPage({super.key});
+
+class LoginPage extends StatefulWidget {
+  const LoginPage({super.key});
+
   @override
-  State<RegisterPage> createState() => _RegisterPageState();
+  State<LoginPage> createState() => _LoginPageState();
 }
-class _RegisterPageState extends State<RegisterPage> {
-  final TextEditingController _fullNameController = TextEditingController();
-  final TextEditingController _emailController = TextEditingController();
+class _LoginPageState extends State<LoginPage> {
+  final TextEditingController _loginController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
 
   bool _isPasswordVisible = false;
-  bool _isRegistered = false;
+  bool _isLoggedIn = false;
 
-  String? _fullNameError;
-  String? _emailError;
+  String? _loginError;
   String? _passwordError;
 
-  bool get _isFullNameValid =>
-      _fullNameController.text.trim().isNotEmpty && _fullNameError == null;
-
-  bool get _isEmailValid =>
-      RegExp(r'^[\w-.]+@([\w-]+\.)+[\w-]{2,4}$')
-              .hasMatch(_emailController.text.trim()) &&
-      _emailError == null;
+  bool get _isLoginValid =>
+      _loginController.text.trim().isNotEmpty && _loginError == null;
 
   bool get _isPasswordValid =>
       _passwordController.text.trim().length >= 6 && _passwordError == null;
 
-  bool get _isFormValid => _isFullNameValid && _isEmailValid && _isPasswordValid;
+  bool get _isFormValid => _isLoginValid && _isPasswordValid;
 
   void _validateFields() {
     setState(() {
-      _fullNameError =
-          _fullNameController.text.trim().isEmpty ? "Full Name required" : null;
-
-      _emailError = RegExp(r'^[\w-.]+@([\w-]+\.)+[\w-]{2,4}$')
-              .hasMatch(_emailController.text.trim())
-          ? null
-          : "Enter a valid email";
+      _loginError =
+          _loginController.text.trim().isEmpty ? "Login required" : null;
 
       _passwordError = _passwordController.text.trim().length < 6
           ? "Password must be at least 6 characters"
@@ -54,14 +45,14 @@ class _RegisterPageState extends State<RegisterPage> {
   @override
   void initState() {
     super.initState();
-    _fullNameController.addListener(_validateFields);
-    _emailController.addListener(_validateFields);
+    _loginController.addListener(_validateFields);
     _passwordController.addListener(_validateFields);
   }
 
   @override
   Widget build(BuildContext context) {
-    final authVM = context.watch<RegisterViewModel>();
+    final authVM = context.watch<LoginViewModel>();
+
     return Scaffold(
       appBar: CustomAppBar(),
       body: SafeArea(
@@ -70,30 +61,21 @@ class _RegisterPageState extends State<RegisterPage> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const SizedBox(height: 20),
+              const SizedBox(height: 40),
               const Text(
-                "Create an account",
+                "Login to your account",
                 style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 8),
-              const Text("Let's create your account."),
+              const Text("It’s great to see you again."),
               const SizedBox(height: 32),
 
               CustomTextField(
-                controller: _fullNameController,
-                label: "Full Name",
-                hint: "Enter your full name",
-                success: _isRegistered && _isFullNameValid,
-                errorText: _fullNameError,
-              ),
-              const SizedBox(height: 16),
-
-              CustomTextField(
-                controller: _emailController,
+                controller: _loginController,
                 label: "Email",
                 hint: "Enter your email address",
-                success: _isRegistered && _isEmailValid,
-                errorText: _emailError,
+                success: _isLoggedIn && _isLoginValid,
+                errorText: _loginError,
               ),
               const SizedBox(height: 16),
 
@@ -102,7 +84,7 @@ class _RegisterPageState extends State<RegisterPage> {
                 label: "Password",
                 hint: "Enter your password",
                 obscure: !_isPasswordVisible,
-                success: _isRegistered && _isPasswordValid,
+                success: _isLoggedIn && _isPasswordValid,
                 errorText: _passwordError,
                 onTogglePassword: () {
                   setState(() {
@@ -112,11 +94,23 @@ class _RegisterPageState extends State<RegisterPage> {
               ),
               const SizedBox(height: 20),
 
-              const Text(
-                "By signing up you agree to our Terms, Privacy Policy, and Cookie Use",
-                style: TextStyle(fontSize: 12, color: Colors.grey),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: [
+                  Text("Forgot your password?", style: TextStyle(color: Theme.of(context).colorScheme.inverseSurface,),),
+                  TextButton(
+                    onPressed: () {
+                      
+                    },
+                    child:   TextButton(
+                    onPressed: () {
+                      GoRouter.of(context).push("/forgot-password");
+                    },
+                    child:  Text("Reset your password", style: TextStyle(color: Theme.of(context).colorScheme.inverseSurface,),),
+                  ),
+                  ),
+                ],
               ),
-              const SizedBox(height: 20),
 
               SizedBox(
                 width: double.infinity,
@@ -129,26 +123,25 @@ class _RegisterPageState extends State<RegisterPage> {
                                 _validateFields();
 
                                 if (_isFormValid) {
-                                  final success = await authVM.register(
-                                    _fullNameController.text.trim(),
-                                    _emailController.text.trim(),
+                                  final success = await authVM.login(
+                                    _loginController.text.trim(),
                                     _passwordController.text.trim(),
                                   );
 
                                   if (success && mounted) {
                                     setState(() {
-                                      _isRegistered = true;
+                                      _isLoggedIn = true;
                                     });
                                     ScaffoldMessenger.of(context).showSnackBar(
                                       const SnackBar(
-                                          content: Text(
-                                              "Account created successfully!")),
+                                          content:
+                                              Text("Login successful ✅")),
                                     );
                                   } else {
                                     ScaffoldMessenger.of(context).showSnackBar(
                                       SnackBar(
                                         content: Text(authVM.errorMessage ??
-                                            "Something went wrong"),
+                                            "Invalid credentials"),
                                       ),
                                     );
                                   }
@@ -163,31 +156,25 @@ class _RegisterPageState extends State<RegisterPage> {
                           ),
                         ),
                         child:  Text(
-                          "Create an Account",
-                          style: TextStyle(color: Theme.of(context).colorScheme.onSurface, fontSize: 16),
+                          "Login",
+                          style: TextStyle(color:Theme.of(context).colorScheme.onSurface, fontSize: 16),
                         ),
                       ),
               ),
-
               const SizedBox(height: 24),
 
-              Row(
-                children: const [
-                  Expanded(child: Divider(thickness: 1)),
-                  Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 8),
-                    child: Text("Or"),
-                  ),
-                  Expanded(child: Divider(thickness: 1)),
-                ],
-              ),
-              const SizedBox(height: 24),
 
               SizedBox(
                 width: double.infinity,
                 height: 50,
                 child: OutlinedButton.icon(
                   onPressed: () {},
+                  style: OutlinedButton.styleFrom(
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(12), 
+      ),
+      side: BorderSide(color: Theme.of(context).colorScheme.inverseSurface), 
+    ),
                   icon: Image.asset("assets/google.png", height: 24),
                   label:  Text("Sign Up with Google", style: TextStyle(color: Theme.of(context).colorScheme.inverseSurface,),),
                 ),
@@ -211,18 +198,15 @@ class _RegisterPageState extends State<RegisterPage> {
               ),
 
               const SizedBox(height: 24),
-
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  const Text("Already have an account?"),
+                  const Text("Don't have an account?"),
                   TextButton(
                     onPressed: () {
-                      Navigator.pop(context);
+                      GoRouter.of(context).push("/register");
                     },
-                    child: GestureDetector(
-                      onTap: () => GoRouter.of(context).push("/login"),
-                      child: Text("Log In", style: TextStyle(color: Theme.of(context).colorScheme.inverseSurface,),), ),
+                    child:  Text("Sign Up", style: TextStyle(color: Theme.of(context).colorScheme.inverseSurface,),),
                   ),
                 ],
               ),

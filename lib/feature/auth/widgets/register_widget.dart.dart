@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:store_app/core/utils/app_colors.dart';
 
 class CustomTextField extends StatelessWidget {
   final TextEditingController controller;
@@ -27,7 +28,9 @@ class CustomTextField extends StatelessWidget {
       obscureText: obscure,
       decoration: InputDecoration(
         labelText: label,
+        labelStyle: TextStyle(color: Theme.of(context).colorScheme.inverseSurface,),
         hintText: hint,
+        hintStyle: TextStyle(color: Theme.of(context).colorScheme.inverseSurface,),
         errorText: errorText,
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(8),
@@ -37,7 +40,7 @@ class CustomTextField extends StatelessWidget {
             color: errorText != null
                 ? Colors.red
                 : success
-                    ? Colors.green
+                    ?AppColors.sucses
                     : Colors.grey,
           ),
           borderRadius: BorderRadius.circular(8),
@@ -45,16 +48,16 @@ class CustomTextField extends StatelessWidget {
         focusedBorder: OutlineInputBorder(
           borderSide: BorderSide(
             color: errorText != null
-                ? Colors.red
+                ? AppColors.error
                 : success
-                    ? Colors.green
-                    : Colors.blue,
+                    ? AppColors.sucses
+                    : AppColors.containerBlue,
             width: 2,
           ),
           borderRadius: BorderRadius.circular(8),
         ),
         suffixIcon: errorText != null
-            ? const Icon(Icons.error, color: Colors.red)
+            ? Icon(Icons.error, color: AppColors.error)
             : success
                 ? const Icon(Icons.check_circle, color: Colors.green)
                 : (onTogglePassword != null

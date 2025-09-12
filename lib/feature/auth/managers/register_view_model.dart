@@ -4,7 +4,7 @@ import 'package:store_app/data/model/auth/register_model.dart';
 import 'package:store_app/data/repostories/auth_repostoriya.dart';
 
 class RegisterViewModel extends ChangeNotifier {
-  final AuthRepository _repository = AuthRepository();
+  final RegisterRepostory _repository = RegisterRepostory();
 
   bool _isLoading = false;
   String? _errorMessage;
@@ -29,7 +29,6 @@ class RegisterViewModel extends ChangeNotifier {
         success = false;
       },
       (response) async {
-        // Agar token bo‘lsa saqlab qo‘yiladi
         if (response.contains("eyJ")) {
           await TokenStorage.saveToken(response);
         }
