@@ -28,7 +28,6 @@ class RegisterRepository {
   }
 }
 
-/// Login qilish uchun repository
 class LoginRepository {
   final ApiClient _apiClient = ApiClient();
 
