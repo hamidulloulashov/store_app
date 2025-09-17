@@ -16,22 +16,18 @@ class LoginViewModel extends ChangeNotifier {
     _isLoading = true;
     _errorMessage = null;
     notifyListeners();
-
     final result = await _repository.login(
       LoginModel(login: login, password: password),
     );
 
     bool success = false;
-
     result.fold(
       (error) {
         _errorMessage = error.toString();
         success = false;
       },
-      (response) async {
-        if (response.contains("eyJ")) {
-          await TokenStorage.saveToken(response);
-        }
+      (token) async {
+        await TokenStorage.saveToken(token);
         success = true;
       },
     );

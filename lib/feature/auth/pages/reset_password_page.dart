@@ -30,8 +30,10 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
     final vm = context.watch<ForgotPasswordViewModel>();
 
     return Scaffold(
+      resizeToAvoidBottomInset: false,
      appBar: CustomAppBar(arrow: "assets/arrow.png",),
       body: SafeArea(
+        
         child: Padding(
           padding: const EdgeInsets.all(24.0),
           child: Form(

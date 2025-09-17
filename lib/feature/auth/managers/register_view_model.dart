@@ -4,7 +4,7 @@ import 'package:store_app/data/model/auth/register_model.dart';
 import 'package:store_app/data/repostories/auth_repostoriya.dart';
 
 class RegisterViewModel extends ChangeNotifier {
-  final RegisterRepostory _repository = RegisterRepostory();
+  final RegisterRepository _repository = RegisterRepository();
 
   bool _isLoading = false;
   String? _errorMessage;

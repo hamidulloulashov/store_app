@@ -119,55 +119,56 @@ class _RegisterPageState extends State<RegisterPage> {
               const SizedBox(height: 20),
 
               SizedBox(
-                width: double.infinity,
-                height: 50,
-                child: authVM.isLoading
-                    ? const Center(child: CircularProgressIndicator())
-                    : ElevatedButton(
-                        onPressed: _isFormValid
-                            ? () async {
-                                _validateFields();
+  width: double.infinity,
+  height: 50,
+  child: authVM.isLoading
+      ? const Center(child: CircularProgressIndicator())
+      : ElevatedButton(
+          onPressed: _isFormValid
+              ? () async {
+                  _validateFields();
 
-                                if (_isFormValid) {
-                                  final success = await authVM.register(
-                                    _fullNameController.text.trim(),
-                                    _emailController.text.trim(),
-                                    _passwordController.text.trim(),
-                                  );
+                  if (_isFormValid) {
+                    final success = await authVM.register(
+                      _fullNameController.text.trim(),
+                      _emailController.text.trim(),
+                      _passwordController.text.trim(),
+                    );
 
-                                  if (success && mounted) {
-                                    setState(() {
-                                      _isRegistered = true;
-                                    });
-                                    ScaffoldMessenger.of(context).showSnackBar(
-                                      const SnackBar(
-                                          content: Text(
-                                              "Account created successfully!")),
-                                    );
-                                  } else {
-                                    ScaffoldMessenger.of(context).showSnackBar(
-                                      SnackBar(
-                                        content: Text(authVM.errorMessage ??
-                                            "Something went wrong"),
-                                      ),
-                                    );
-                                  }
-                                }
-                              }
-                            : null,
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor:
-                              _isFormValid ? Theme.of(context).colorScheme.inverseSurface : Colors.grey,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(8),
-                          ),
+                    if (success && mounted) {
+                      setState(() {
+                        _isRegistered = true;
+                      });
+                      GoRouter.of(context).go("/home"); // 🔥
+                    } else {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text(authVM.errorMessage ??
+                              "Something went wrong"),
                         ),
-                        child:  Text(
-                          "Create an Account",
-                          style: TextStyle(color: Theme.of(context).colorScheme.onSurface, fontSize: 16),
-                        ),
-                      ),
-              ),
+                      );
+                    }
+                  }
+                }
+              : null,
+          style: ElevatedButton.styleFrom(
+            backgroundColor: _isFormValid
+                ? Theme.of(context).colorScheme.inverseSurface
+                : Colors.grey,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(8),
+            ),
+          ),
+          child: Text(
+            "Create an Account",
+            style: TextStyle(
+              color: Theme.of(context).colorScheme.inversePrimary,
+              fontSize: 16,
+            ),
+          ),
+        ),
+),
+
 
               const SizedBox(height: 24),
 

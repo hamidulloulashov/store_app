@@ -3,7 +3,7 @@ import 'package:store_app/core/result.dart';
 import '../../../data/repostories/auth_repostoriya.dart';
 
 class ForgotPasswordViewModel extends ChangeNotifier {
-  final ForgotPaswordRepository _repository = ForgotPaswordRepository();
+  final ForgotPasswordRepository _repository = ForgotPasswordRepository();
 
   bool _isLoading = false;
   String? _errorMessage;

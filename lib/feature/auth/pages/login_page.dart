@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
-import 'package:store_app/core/utils/app_colors.dart';
 import 'package:store_app/feature/common/widget/custom_appbar.dart';
 import '../managers/login_view_model.dart';
 import '../widgets/register_widget.dart.dart';
@@ -112,55 +111,56 @@ class _LoginPageState extends State<LoginPage> {
                 ],
               ),
 
-              SizedBox(
-                width: double.infinity,
-                height: 50,
-                child: authVM.isLoading
-                    ? const Center(child: CircularProgressIndicator())
-                    : ElevatedButton(
-                        onPressed: _isFormValid
-                            ? () async {
-                                _validateFields();
+             SizedBox(
+  width: double.infinity,
+  height: 50,
+  child: authVM.isLoading
+      ? const Center(child: CircularProgressIndicator())
+      : ElevatedButton(
+          onPressed: _isFormValid
+              ? () async {
+                  _validateFields();
 
-                                if (_isFormValid) {
-                                  final success = await authVM.login(
-                                    _loginController.text.trim(),
-                                    _passwordController.text.trim(),
-                                  );
+                  if (_isFormValid) {
+                    final success = await authVM.login(
+                      _loginController.text.trim(),
+                      _passwordController.text.trim(),
+                    );
 
-                                  if (success && mounted) {
-                                    setState(() {
-                                      _isLoggedIn = true;
-                                    });
-                                    ScaffoldMessenger.of(context).showSnackBar(
-                                      const SnackBar(
-                                          content:
-                                              Text("Login successful ✅")),
-                                    );
-                                  } else {
-                                    ScaffoldMessenger.of(context).showSnackBar(
-                                      SnackBar(
-                                        content: Text(authVM.errorMessage ??
-                                            "Invalid credentials"),
-                                      ),
-                                    );
-                                  }
-                                }
-                              }
-                            : null,
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor:
-                              _isFormValid ? Theme.of(context).colorScheme.inverseSurface : Colors.grey,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(8),
-                          ),
+                    if (success && mounted) {
+                      setState(() {
+                        _isLoggedIn = true;
+                      });
+                      GoRouter.of(context).go("/home"); 
+                    } else {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text(authVM.errorMessage ??
+                              "Invalid credentials"),
                         ),
-                        child:  Text(
-                          "Login",
-                          style: TextStyle(color:Theme.of(context).colorScheme.onSurface, fontSize: 16),
-                        ),
-                      ),
-              ),
+                      );
+                    }
+                  }
+                }
+              : null,
+          style: ElevatedButton.styleFrom(
+            backgroundColor: _isFormValid
+                ? Theme.of(context).colorScheme.onSurface
+                : Colors.grey,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(8),
+            ),
+          ),
+          child: Text(
+            "Login",
+            style: TextStyle(
+              color: Theme.of(context).colorScheme.onInverseSurface,
+              fontSize: 16,
+            ),
+          ),
+        ),
+),
+
               const SizedBox(height: 24),
 
 

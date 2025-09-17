@@ -24,4 +24,8 @@ final List<SingleChildWidget> dependencies = [
       ChangeNotifierProvider<ForgotPasswordViewModel>(
     create: (_) => ForgotPasswordViewModel(),
   ),
+       ChangeNotifierProvider<ForgotPasswordViewModel>(
+    create: (_) => ForgotPasswordViewModel(),
+  ),
+  
 ];

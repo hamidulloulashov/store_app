@@ -5,6 +5,5 @@ class Routes {
   static const register = "/register";
   static const forgot_password = "/forgot-password";
   static const reset = "/reset";
-
-
+  static const home = "/home";
 }
