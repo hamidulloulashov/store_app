@@ -1,11 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
+import '../../../core/router/routes.dart';
 import '../managers/theme_view_model.dart';
+
 class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
   final String? title;
   final List<Widget>? actions;
-  final String? arrow;
-  final String? first;
+  final String? arrow; 
+  final String? first; 
+  final VoidCallback? onFirstTap; 
   final Color? containerColor;
   final PreferredSizeWidget? bottom;
 
@@ -15,6 +19,7 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
     this.actions,
     this.arrow,
     this.first,
+    this.onFirstTap,
     this.containerColor,
     this.bottom,
   });
@@ -30,18 +35,22 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
     return AppBar(
       automaticallyImplyLeading: false,
       elevation: 0,
-      backgroundColor: containerColor ?? Theme.of(context).appBarTheme.backgroundColor,
+      backgroundColor:
+          containerColor ?? Theme.of(context).appBarTheme.backgroundColor,
       bottom: bottom,
       leading: arrow != null
           ? GestureDetector(
               onTap: () {
-                if (Navigator.of(context).canPop()) {
-                  Navigator.of(context).pop();
-                }
+                if (Navigator.of(context).canPop()) Navigator.of(context).pop();
               },
               child: Padding(
                 padding: const EdgeInsets.all(19),
-                child: Image.asset(arrow!, width: 10, height: 13, color: Theme.of(context).colorScheme.inverseSurface,),
+                child: Image.asset(
+                  arrow!,
+                  width: 24,
+                  height: 24,
+                  color: Theme.of(context).colorScheme.inverseSurface,
+                ),
               ),
             )
           : null,
@@ -58,6 +67,21 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
             )
           : null,
       actions: [
+        if (first != null)
+          Padding(
+            padding: const EdgeInsets.only(right: 8),
+            child: GestureDetector(
+              onTap: onFirstTap ?? () {
+                GoRouter.of(context).push(Routes.notification);
+              },
+              child: Image.asset(
+                first!,
+                width: 20,
+                height: 20,
+                color: Theme.of(context).colorScheme.inverseSurface,
+              ),
+            ),
+          ),
         ...?actions,
         IconButton(
           icon: Icon(isDark ? Icons.dark_mode : Icons.light_mode),

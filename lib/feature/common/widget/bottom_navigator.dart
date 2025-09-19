@@ -1,14 +1,9 @@
 import 'package:flutter/material.dart';
-import '../../../core/utils/app_colors.dart';
+import 'package:go_router/go_router.dart';
 
-class BottomNavigatorNews extends StatefulWidget {
+class BottomNavigatorNews extends StatelessWidget {
   const BottomNavigatorNews({super.key});
 
-  @override
-  State<BottomNavigatorNews> createState() => _BottomNavigatorNewsState();
-}
-
-class _BottomNavigatorNewsState extends State<BottomNavigatorNews> {
   final List<String> icons = const [
     "assets/home.png",
     "assets/search.png",
@@ -17,27 +12,48 @@ class _BottomNavigatorNewsState extends State<BottomNavigatorNews> {
     "assets/profile.png",
   ];
 
-  int _selectedIndex = 0; // default tanlangan icon
+  int _getSelectedIndex(String location) {
+    if (location.startsWith('/home')) return 0;
+    if (location.startsWith('/search')) return 1;
+    if (location.startsWith('/save')) return 2;
+    if (location.startsWith('/shop')) return 3;
+    if (location.startsWith('/profile')) return 4;
+    return 0;
+  }
 
-  void _onItemTapped(int index) {
-    setState(() {
-      _selectedIndex = index; // bosilganda index yangilanadi
-    });
+  void _onItemTapped(BuildContext context, int index) {
+    switch (index) {
+      case 0:
+        context.go('/home');
+        break;
+      case 1:
+        // context.go('/search');
+        break;
+      case 2:
+        context.go('/save');
+        break;
+      case 3:
+        // context.go('/shop');
+        break;
+      case 4:
+        // context.go('/profile');
+        break;
+    }
   }
 
   @override
   Widget build(BuildContext context) {
+    final String location = GoRouterState.of(context).uri.toString();
+    final int selectedIndex = _getSelectedIndex(location);
+
     return Container(
       width: double.infinity,
       height: 86,
       decoration: BoxDecoration(
-        color: AppColors.white,
+        color: Theme.of(context).colorScheme.onErrorContainer,
         boxShadow: [
           BoxShadow(
-            color: Theme.of(context)
-                .colorScheme
-                .onInverseSurface
-                .withAlpha(200),
+            color: Theme.of(context).colorScheme.onInverseSurface.withAlpha(200),
             blurRadius: 50,
             spreadRadius: 20,
             offset: const Offset(0, 30),
@@ -47,15 +63,14 @@ class _BottomNavigatorNewsState extends State<BottomNavigatorNews> {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: List.generate(icons.length, (index) {
-          final bool isSelected = index == _selectedIndex;
+          final bool isSelected = index == selectedIndex;
+
           return GestureDetector(
-            onTap: () => _onItemTapped(index),
+            onTap: () => _onItemTapped(context, index),
             child: ColorFiltered(
               colorFilter: isSelected
-                  ? const ColorFilter.mode(
-                      AppColors.containerBlack, BlendMode.srcIn) // 🔥 tanlangan qora
-                  : const ColorFilter.mode(
-                      Colors.grey, BlendMode.srcIn), // ⚪️ qolganlari kulrang
+                  ?  ColorFilter.mode(Theme.of(context).colorScheme.onPrimaryContainer, BlendMode.srcIn)
+                  : const ColorFilter.mode(Colors.grey, BlendMode.srcIn),
               child: Image.asset(
                 icons[index],
                 width: 28,

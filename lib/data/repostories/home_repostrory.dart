@@ -1,12 +1,12 @@
-import 'package:store_app/data/model/home_model.dart/product_detail_model.dart'
+import 'package:store_app/data/model/home_model.dart/product_model.dart'
     show CategoryModel, ProductModel;
-
+import 'package:store_app/data/model/home_model.dart/product_detail_model.dart';
 import '../../core/client.dart';
 
 abstract class ProductRepository {
   Future<List<CategoryModel>> getCategories();
   Future<List<ProductModel>> getProducts({int? categoryId});
-  Future<ProductModel> getProductDetail(int productId);
+  Future<ProductDetailModel> getProductDetail(int productId); // 🔥 o‘zgardi
   Future<void> toggleLikeProduct(String productId, {required bool isLiked});
 }
 
@@ -43,24 +43,26 @@ class ProductRepositoryImpl implements ProductRepository {
   }
 
   @override
-  Future<ProductModel> getProductDetail(int productId) async {
+  Future<ProductDetailModel> getProductDetail(int productId) async {
     final result =
         await _client.get<Map<String, dynamic>>('/products/detail/$productId');
     if (result.isSuccess) {
-      return ProductModel.fromJson(result.data!);
+      return ProductDetailModel.fromJson(result.data!); 
     } else {
       throw result.exception ?? Exception("Product detailni olishda xatolik");
     }
   }
 
   @override
-  Future<void> toggleLikeProduct(String productId, {required bool isLiked}) async {
-    final endpoint = isLiked ? '/auth/unsave/$productId' : '/auth/save/$productId';
+  Future<void> toggleLikeProduct(String productId,
+      {required bool isLiked}) async {
+    final endpoint =
+        isLiked ? '/auth/unsave/$productId' : '/auth/save/$productId';
     final result = await _client.post(endpoint, data: null);
 
     if (!result.isSuccess) {
-      throw result.exception ?? Exception(
-          isLiked ? "Unsave qilishda xatolik" : "Save qilishda xatolik");
+      throw result.exception ??
+          Exception(isLiked ? "Unsave qilishda xatolik" : "Save qilishda xatolik");
     }
   }
 }

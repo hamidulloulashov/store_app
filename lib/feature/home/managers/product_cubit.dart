@@ -1,7 +1,7 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'product_state.dart';
 import '../../../data/repostories/home_repostrory.dart';
-import '../../../data/model/home_model.dart/product_detail_model.dart';
+import '../../../data/model/home_model.dart/product_model.dart';
 
 class ProductCubit extends Cubit<ProductState> {
   final ProductRepository _repository;
@@ -45,9 +45,23 @@ class ProductCubit extends Cubit<ProductState> {
     }
   }
 
-  void changeCategory(int categoryId) {
+  void changeCategory(int categoryId, List<ProductModel> allProducts) {
     emit(state.copyWith(selectedCategoryId: categoryId));
-    loadProducts(categoryId: categoryId);
+    
+    if (categoryId == 0) {
+      // Barcha mahsulotlarni ko'rsatish
+      emit(state.copyWith(
+        products: allProducts,
+        status: ProductStatus.success,
+      ));
+    } else {
+      // Kategoriya bo'yicha filtrash
+      final filtered = allProducts.where((p) => p.categoryId == categoryId).toList();
+      emit(state.copyWith(
+        products: filtered,
+        status: ProductStatus.success,
+      ));
+    }
   }
 
   Future<void> toggleLikeProduct(int productId) async {
@@ -76,17 +90,36 @@ class ProductCubit extends Cubit<ProductState> {
       ));
     }
   }
-    void searchProducts(String query) {
+
+  void searchProducts(String query, List<ProductModel> allProducts) {
     if (query.isEmpty) {
-      // agar qidiruv bo‘sh bo‘lsa, kategoriya bo‘yicha productlarni qayta yuklaymiz
-      loadProducts(categoryId: state.selectedCategoryId);
+      // Agar search bo'sh bo'lsa, tanlangan kategoriya bo'yicha ko'rsatish
+      changeCategory(state.selectedCategoryId, allProducts);
     } else {
-      final filtered = state.products
+      // Qidiruv natijalarini ko'rsatish
+      List<ProductModel> searchBase = allProducts;
+      
+      // Agar kategoriya tanlangan bo'lsa, o'sha kategoriyadan qidirish
+      if (state.selectedCategoryId != 0) {
+        searchBase = allProducts.where((p) => p.categoryId == state.selectedCategoryId).toList();
+      }
+      
+      final filtered = searchBase
           .where((p) => p.title.toLowerCase().contains(query.toLowerCase()))
           .toList();
 
-      emit(state.copyWith(products: filtered));
+      emit(state.copyWith(
+        products: filtered,
+        status: ProductStatus.success,
+      ));
     }
   }
 
+  void clearSearch() {
+    emit(state.copyWith(
+      products: [],
+      selectedCategoryId: 0,
+      status: ProductStatus.initial,
+    ));
+  }
 }

@@ -1,11 +1,19 @@
 class RegisterModel {
   final String fullName;
-  final String password;
   final String email;
+  final String password;
 
-  RegisterModel({required this.fullName, required this.password, required this.email,});
+  RegisterModel({
+    required this.fullName,
+    required this.email,
+    required this.password,
+  });
 
   Map<String, dynamic> toJson() {
-    return {"fullName": fullName, "password": password, "email": email};
+    return {
+      "fullName": fullName,
+      "email": email,
+      "password": password,
+    };
   }
 }

@@ -1,33 +1,32 @@
-import 'package:flutter/material.dart';
+import 'package:bloc/bloc.dart';
 import 'package:store_app/core/result.dart';
-import '../../../data/repostories/auth_repostoriya.dart';
+import 'package:store_app/feature/auth/managers/forgot/forgot_state.dart' show ForgotPasswordState;
 
-class ForgotPasswordViewModel extends ChangeNotifier {
+import '../../../../data/repostories/auth_repostoriya.dart';
+
+class ForgotPasswordCubit extends Cubit<ForgotPasswordState> {
   final ForgotPasswordRepository _repository = ForgotPasswordRepository();
 
-  bool _isLoading = false;
-  String? _errorMessage;
-
-  String? _email;
-  String? _code;
-
-  bool get isLoading => _isLoading;
-  String? get errorMessage => _errorMessage;
-  String? get email => _email;
-  String? get code => _code;
+  ForgotPasswordCubit() : super(const ForgotPasswordState());
 
   void setEmail(String email) {
-    _email = email;
-    notifyListeners();
+    emit(state.copyWith(email: email, errorMessage: null));
   }
 
   void setCode(String code) {
-    _code = code;
-    notifyListeners();
+    emit(state.copyWith(code: code, errorMessage: null));
+  }
+
+  void clearError() {
+    emit(state.copyWith(errorMessage: null));
+  }
+
+  void clearAll() {
+    emit(const ForgotPasswordState());
   }
 
   Future<bool> sendResetCode([String? email]) async {
-    final usedEmail = email ?? _email;
+    final usedEmail = email ?? state.email;
     if (usedEmail == null || !_isValidEmail(usedEmail)) {
       _setError('Please enter a valid email address');
       return false;
@@ -35,27 +34,25 @@ class ForgotPasswordViewModel extends ChangeNotifier {
 
     final success = await _handleRequest(() => _repository.sendResetCode(usedEmail));
     if (success) {
-      _email = usedEmail;
-      notifyListeners();
+      emit(state.copyWith(email: usedEmail));
     }
     return success;
   }
 
   Future<bool> verifyCode([String? code]) async {
-    final usedCode = code ?? _code;
+    final usedCode = code ?? state.code;
     if (usedCode == null || usedCode.length != 4) {
       _setError('Please enter a 4-digit code');
       return false;
     }
-    if (_email == null) {
+    if (state.email == null) {
       _setError('Email not set. Please restart the process.');
       return false;
     }
 
-    final success = await _handleRequest(() => _repository.verifyCode(_email!, usedCode));
+    final success = await _handleRequest(() => _repository.verifyCode(state.email!, usedCode));
     if (success) {
-      _code = usedCode;
-      notifyListeners();
+      emit(state.copyWith(code: usedCode));
     }
     return success;
   }
@@ -65,13 +62,13 @@ class ForgotPasswordViewModel extends ChangeNotifier {
       _setError('Password must be at least 8 characters long');
       return false;
     }
-    if (_email == null || _code == null) {
+    if (state.email == null || state.code == null) {
       _setError('Missing email or code. Please restart the process.');
       return false;
     }
 
     final success = await _handleRequest(
-      () => _repository.resetPassword(_email!, _code!, newPassword),
+      () => _repository.resetPassword(state.email!, state.code!, newPassword),
     );
 
     if (success) {
@@ -97,28 +94,24 @@ class ForgotPasswordViewModel extends ChangeNotifier {
 
     result.fold(
       (error) {
-        _errorMessage = _mapError(error);
+        _setError(_mapError(error));
         success = false;
       },
       (data) {
-        _errorMessage = null;
+        _setError(null);
         success = true;
       },
     );
 
-    notifyListeners();
     return success;
   }
 
   void _setLoading(bool value) {
-    _isLoading = value;
-    notifyListeners();
+    emit(state.copyWith(isLoading: value));
   }
 
-  void _setError(String message) {
-    _errorMessage = message;
-    _isLoading = false;
-    notifyListeners();
+  void _setError(String? message) {
+    emit(state.copyWith(errorMessage: message, isLoading: false));
   }
 
   bool _isValidEmail(String email) {
@@ -132,18 +125,5 @@ class ForgotPasswordViewModel extends ChangeNotifier {
     if (msg.contains('500')) return 'Server error. Please try again later';
     if (msg.contains('timeout')) return 'Connection timeout. Please try again';
     return 'Something went wrong. Please try again';
-  }
-
-  void clearError() {
-    _errorMessage = null;
-    notifyListeners();
-  }
-
-  void clearAll() {
-    _email = null;
-    _code = null;
-    _errorMessage = null;
-    _isLoading = false;
-    notifyListeners();
   }
 }

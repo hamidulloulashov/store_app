@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
-import 'package:provider/provider.dart';
 import 'package:store_app/feature/common/widget/custom_appbar.dart';
-import '../managers/login_view_model.dart';
+import '../managers/aut/login_cubit.dart';
+import '../managers/aut/login_state.dart';
 import '../widgets/register_widget.dart.dart';
-
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -12,6 +12,7 @@ class LoginPage extends StatefulWidget {
   @override
   State<LoginPage> createState() => _LoginPageState();
 }
+
 class _LoginPageState extends State<LoginPage> {
   final TextEditingController _loginController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
@@ -50,169 +51,194 @@ class _LoginPageState extends State<LoginPage> {
 
   @override
   Widget build(BuildContext context) {
-    final authVM = context.watch<LoginViewModel>();
-
-    return Scaffold(
-      appBar: CustomAppBar(),
-      body: SafeArea(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.all(24),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const SizedBox(height: 40),
-              const Text(
-                "Login to your account",
-                style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+    return BlocProvider(
+      create: (_) => LoginCubit(),
+      child: BlocConsumer<LoginCubit, LoginState>(
+        listener: (context, state) {
+          if (state.errorMessage != null) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text(state.errorMessage!),
+                backgroundColor: Theme.of(context).colorScheme.error,
               ),
-              const SizedBox(height: 8),
-              const Text("It’s great to see you again."),
-              const SizedBox(height: 32),
+            );
+          }
+        },
+        builder: (context, state) {
+          final loginCubit = context.read<LoginCubit>();
 
-              CustomTextField(
-                controller: _loginController,
-                label: "Email",
-                hint: "Enter your email address",
-                success: _isLoggedIn && _isLoginValid,
-                errorText: _loginError,
-              ),
-              const SizedBox(height: 16),
-
-              CustomTextField(
-                controller: _passwordController,
-                label: "Password",
-                hint: "Enter your password",
-                obscure: !_isPasswordVisible,
-                success: _isLoggedIn && _isPasswordValid,
-                errorText: _passwordError,
-                onTogglePassword: () {
-                  setState(() {
-                    _isPasswordVisible = !_isPasswordVisible;
-                  });
-                },
-              ),
-              const SizedBox(height: 20),
-
-              Row(
-                mainAxisAlignment: MainAxisAlignment.start,
-                children: [
-                  Text("Forgot your password?", style: TextStyle(color: Theme.of(context).colorScheme.inverseSurface,),),
-                  TextButton(
-                    onPressed: () {
-                      
-                    },
-                    child:   TextButton(
-                    onPressed: () {
-                      GoRouter.of(context).push("/forgot-password");
-                    },
-                    child:  Text("Reset your password", style: TextStyle(color: Theme.of(context).colorScheme.inverseSurface,),),
-                  ),
-                  ),
-                ],
-              ),
-
-             SizedBox(
-  width: double.infinity,
-  height: 50,
-  child: authVM.isLoading
-      ? const Center(child: CircularProgressIndicator())
-      : ElevatedButton(
-          onPressed: _isFormValid
-              ? () async {
-                  _validateFields();
-
-                  if (_isFormValid) {
-                    final success = await authVM.login(
-                      _loginController.text.trim(),
-                      _passwordController.text.trim(),
-                    );
-
-                    if (success && mounted) {
-                      setState(() {
-                        _isLoggedIn = true;
-                      });
-                      GoRouter.of(context).go("/home"); 
-                    } else {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          content: Text(authVM.errorMessage ??
-                              "Invalid credentials"),
-                        ),
-                      );
-                    }
-                  }
-                }
-              : null,
-          style: ElevatedButton.styleFrom(
-            backgroundColor: _isFormValid
-                ? Theme.of(context).colorScheme.onSurface
-                : Colors.grey,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(8),
-            ),
-          ),
-          child: Text(
-            "Login",
-            style: TextStyle(
-              color: Theme.of(context).colorScheme.onInverseSurface,
-              fontSize: 16,
-            ),
-          ),
-        ),
-),
-
-              const SizedBox(height: 24),
-
-
-              SizedBox(
-                width: double.infinity,
-                height: 50,
-                child: OutlinedButton.icon(
-                  onPressed: () {},
-                  style: OutlinedButton.styleFrom(
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12), 
-      ),
-      side: BorderSide(color: Theme.of(context).colorScheme.inverseSurface), 
-    ),
-                  icon: Image.asset("assets/google.png", height: 24),
-                  label:  Text("Sign Up with Google", style: TextStyle(color: Theme.of(context).colorScheme.inverseSurface,),),
-                ),
-              ),
-              const SizedBox(height: 16),
-
-              SizedBox(
-                width: double.infinity,
-                height: 50,
-                child: ElevatedButton.icon(
-                  onPressed: () {},
-                  icon: Image.asset("assets/facebook.png", height: 24),
-                  label: const Text("Sign Up with Facebook"),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.blue,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8),
+          return Scaffold(
+            appBar: CustomAppBar(),
+            body: SafeArea(
+              child: SingleChildScrollView(
+                padding: const EdgeInsets.all(24),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const SizedBox(height: 40),
+                    const Text(
+                      "Login to your account",
+                      style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
                     ),
-                  ),
+                    const SizedBox(height: 8),
+                    const Text("It’s great to see you again."),
+                    const SizedBox(height: 32),
+
+                    CustomTextField(
+                      controller: _loginController,
+                      label: "Email",
+                      hint: "Enter your email address",
+                      success: _isLoggedIn && _isLoginValid,
+                      errorText: _loginError,
+                    ),
+                    const SizedBox(height: 16),
+
+                    CustomTextField(
+                      controller: _passwordController,
+                      label: "Password",
+                      hint: "Enter your password",
+                      obscure: !_isPasswordVisible,
+                      success: _isLoggedIn && _isPasswordValid,
+                      errorText: _passwordError,
+                      onTogglePassword: () {
+                        setState(() {
+                          _isPasswordVisible = !_isPasswordVisible;
+                        });
+                      },
+                    ),
+                    const SizedBox(height: 20),
+
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: [
+                        Text(
+                          "Forgot your password?",
+                          style: TextStyle(
+                            color: Theme.of(context).colorScheme.inverseSurface,
+                          ),
+                        ),
+                        TextButton(
+                          onPressed: () {
+                            GoRouter.of(context).push("/forgot-password");
+                          },
+                          child: Text(
+                            "Reset your password",
+                            style: TextStyle(
+                              color: Theme.of(context).colorScheme.inverseSurface,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+
+                    SizedBox(
+                      width: double.infinity,
+                      height: 50,
+                      child: state.isLoading
+                          ? const Center(child: CircularProgressIndicator())
+                          : ElevatedButton(
+                              onPressed: _isFormValid
+                                  ? () async {
+                                      _validateFields();
+
+                                      if (_isFormValid) {
+                                        final success = await loginCubit.login(
+                                          _loginController.text.trim(),
+                                          _passwordController.text.trim(),
+                                        );
+
+                                        if (success && mounted) {
+                                          setState(() {
+                                            _isLoggedIn = true;
+                                          });
+                                          GoRouter.of(context).go("/home");
+                                        }
+                                      }
+                                    }
+                                  : null,
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: _isFormValid
+                                    ? Theme.of(context).colorScheme.onSurface
+                                    : Colors.grey,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                              ),
+                              child: Text(
+                                "Login",
+                                style: TextStyle(
+                                  color: Theme.of(context).colorScheme.onInverseSurface,
+                                  fontSize: 16,
+                                ),
+                              ),
+                            ),
+                    ),
+
+                    const SizedBox(height: 24),
+
+                    SizedBox(
+                      width: double.infinity,
+                      height: 50,
+                      child: OutlinedButton.icon(
+                        onPressed: () {},
+                        style: OutlinedButton.styleFrom(
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          side: BorderSide(
+                              color: Theme.of(context).colorScheme.inverseSurface),
+                        ),
+                        icon: Image.asset("assets/google.png", height: 24),
+                        label: Text(
+                          "Sign Up with Google",
+                          style: TextStyle(
+                            color: Theme.of(context).colorScheme.inverseSurface,
+                          ),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+
+                    SizedBox(
+                      width: double.infinity,
+                      height: 50,
+                      child: ElevatedButton.icon(
+                        onPressed: () {},
+                        icon: Image.asset("assets/facebook.png", height: 24),
+                        label: const Text("Sign Up with Facebook"),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.blue,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                        ),
+                      ),
+                    ),
+
+                    const SizedBox(height: 24),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        const Text("Don't have an account?"),
+                        TextButton(
+                          onPressed: () {
+                            GoRouter.of(context).push("/register");
+                          },
+                          child: Text(
+                            "Sign Up",
+                            style: TextStyle(
+                              color: Theme.of(context).colorScheme.inverseSurface,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
                 ),
               ),
-
-              const SizedBox(height: 24),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  const Text("Don't have an account?"),
-                  TextButton(
-                    onPressed: () {
-                      GoRouter.of(context).push("/register");
-                    },
-                    child:  Text("Sign Up", style: TextStyle(color: Theme.of(context).colorScheme.inverseSurface,),),
-                  ),
-                ],
-              ),
-            ],
-          ),
-        ),
+            ),
+          );
+        },
       ),
     );
   }

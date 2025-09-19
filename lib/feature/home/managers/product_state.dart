@@ -1,5 +1,5 @@
 import 'package:equatable/equatable.dart';
-import '../../../data/model/home_model.dart/product_detail_model.dart';
+import '../../../data/model/home_model.dart/product_model.dart';
 
 enum ProductStatus { initial, loading, success, failure }
 

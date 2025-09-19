@@ -1,83 +1,69 @@
-class CategoryModel {
+class ProductDetailModel {
   final int id;
   final String title;
-
-  CategoryModel({required this.id, required this.title});
-
-  factory CategoryModel.fromJson(Map<String, dynamic> json) {
-    return CategoryModel(
-      id: json['id'],
-      title: json['title'],
-    );
-  }
-
-  Map<String, dynamic> toJson() => {
-        'id': id,
-        'title': title,
-      };
-}
-
-class ProductModel {
-  final int id;
-  final int categoryId;
-  final String title;
-  final String image; // API dan keladigan maydon
+  final String description;
   final double price;
   final bool isLiked;
-  final double discount;
+  final List<ProductImage> productImages;
+  final List<ProductSize> productSizes;
+  final int reviewsCount;
+  final double rating;
 
-  ProductModel({
+  ProductDetailModel({
     required this.id,
-    required this.categoryId,
     required this.title,
-    required this.image,
+    required this.description,
     required this.price,
     required this.isLiked,
-    required this.discount,
+    required this.productImages,
+    required this.productSizes,
+    required this.reviewsCount,
+    required this.rating,
   });
 
-  // 🔹 Getter imageUrl, _ProductCard ichida ishlatish uchun
-  String get imageUrl => image;
-
-  ProductModel copyWith({
-    int? id,
-    int? categoryId,
-    String? title,
-    String? image,
-    double? price,
-    bool? isLiked,
-    double? discount,
-  }) {
-    return ProductModel(
-      id: id ?? this.id,
-      categoryId: categoryId ?? this.categoryId,
-      title: title ?? this.title,
-      image: image ?? this.image,
-      price: price ?? this.price,
-      isLiked: isLiked ?? this.isLiked,
-      discount: discount ?? this.discount,
-    );
-  }
-
-  factory ProductModel.fromJson(Map<String, dynamic> json) {
-    return ProductModel(
+  factory ProductDetailModel.fromJson(Map<String, dynamic> json) {
+    return ProductDetailModel(
       id: json['id'],
-      categoryId: json['categoryId'],
       title: json['title'],
-      image: json['image'] ?? '',
+      description: json['description'],
       price: (json['price'] as num).toDouble(),
-      isLiked: json['isLiked'] ?? false,
-      discount: (json['discount'] as num).toDouble(),
+      isLiked: json['isLiked'],
+      productImages: (json['productImages'] as List)
+          .map((e) => ProductImage.fromJson(e))
+          .toList(),
+      productSizes: (json['productSizes'] as List)
+          .map((e) => ProductSize.fromJson(e))
+          .toList(),
+      reviewsCount: json['reviewsCount'],
+      rating: (json['rating'] as num).toDouble(),
     );
   }
+}
 
-  Map<String, dynamic> toJson() => {
-        'id': id,
-        'categoryId': categoryId,
-        'title': title,
-        'image': image,
-        'price': price,
-        'isLiked': isLiked,
-        'discount': discount,
-      };
+class ProductImage {
+  final int id;
+  final String image;
+
+  ProductImage({required this.id, required this.image});
+
+  factory ProductImage.fromJson(Map<String, dynamic> json) {
+    return ProductImage(
+      id: json['id'],
+      image: json['image'],
+    );
+  }
+}
+
+class ProductSize {
+  final int id;
+  final String title;
+
+  ProductSize({required this.id, required this.title});
+
+  factory ProductSize.fromJson(Map<String, dynamic> json) {
+    return ProductSize(
+      id: json['id'],
+      title: json['title'],
+    );
+  }
 }

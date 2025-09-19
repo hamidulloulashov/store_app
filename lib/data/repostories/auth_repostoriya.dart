@@ -3,28 +3,33 @@ import 'package:store_app/core/result.dart';
 import 'package:store_app/data/model/auth/login_model.dart';
 import 'package:store_app/data/model/auth/register_model.dart';
 
-/// Ro‘yxatdan o‘tish uchun repository
 class RegisterRepository {
   final ApiClient _apiClient = ApiClient();
 
-  Future<Result<String>> register(RegisterModel registerModel) async {
-    final result = await _apiClient.post<Map<String, dynamic>>(
-      "/auth/register",
-      data: registerModel.toJson(),
-    );
+  Future<Result<String>> register(RegisterModel model) async {
+    try {
+      final result = await _apiClient.post<Map<String, dynamic>>(
+        "/auth/register",
+        data: model.toJson(),
+      );
 
-    return result.fold(
-      (error) => Result.error(error),
-      (data) {
-        final token = data["token"] as String?;
-        if (token != null) {
+      return result.fold(
+        (error) => Result.error(error),
+        (data) {
+          final token = data["token"] as String? ?? 
+                       data["accessToken"] as String? ?? 
+                       data["access_token"] as String? ?? "";
+          
+          if (token.isEmpty) {
+            return Result.error(Exception("Token not found in response"));
+          }
+          
           return Result.ok(token);
-        }
-        final message =
-            data["message"] as String? ?? "Ro‘yxatdan o‘tish muvaffaqiyatli";
-        return Result.ok(message);
-      },
-    );
+        },
+      );
+    } catch (e) {
+      return Result.error(Exception("Registration failed: ${e.toString()}"));
+    }
   }
 }
 
@@ -32,22 +37,29 @@ class LoginRepository {
   final ApiClient _apiClient = ApiClient();
 
   Future<Result<String>> login(LoginModel loginModel) async {
-    final result = await _apiClient.post<Map<String, dynamic>>(
-      "/auth/login",
-      data: loginModel.toJson(),
-    );
+    try {
+      final result = await _apiClient.post<Map<String, dynamic>>(
+        "/auth/login",
+        data: loginModel.toJson(),
+      );
 
-    return result.fold(
-      (error) => Result.error(error),
-      (data) {
-        final token = data["accessToken"] as String?;
-        if (token != null) {
+      return result.fold(
+        (error) => Result.error(error),
+        (data) {
+          final token = data["accessToken"] as String? ?? 
+                       data["access_token"] as String? ?? 
+                       data["token"] as String? ?? "";
+          
+          if (token.isEmpty) {
+            return Result.error(Exception("Login failed: Token not found"));
+          }
+          
           return Result.ok(token);
-        }
-        final message = data["message"] as String? ?? "Login muvaffaqiyatli";
-        return Result.ok(message);
-      },
-    );
+        },
+      );
+    } catch (e) {
+      return Result.error(Exception("Login failed: ${e.toString()}"));
+    }
   }
 }
 
@@ -83,8 +95,11 @@ class ForgotPasswordRepository {
     );
 
     return res.fold(
-      (err) => Result.error(err),
+      (err) { 
+        print("Xatolik:$err");
+        return Result.error(err);},
       (data) {
+        print("SUCCESS:$data");
         if (data is Map<String, dynamic>) {
           return Result.ok(data["message"]?.toString() ?? "Code verified");
         } else if (data is String) {
@@ -97,7 +112,6 @@ class ForgotPasswordRepository {
     );
   }
 
-  /// Parolni tiklash
   Future<Result<String>> resetPassword(
     String email,
     String code,
@@ -124,7 +138,6 @@ class ForgotPasswordRepository {
     );
   }
 
-  /// Xatolik borligini tekshiradigan helper
   bool _hasError(String msg) {
     final lower = msg.toLowerCase();
     return lower.contains("wrong") || lower.contains("error");

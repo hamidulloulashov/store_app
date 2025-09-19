@@ -6,4 +6,6 @@ class Routes {
   static const forgot_password = "/forgot-password";
   static const reset = "/reset";
   static const home = "/home";
+   static const notification = '/notification'; 
+   static const save = "/save";
 }
