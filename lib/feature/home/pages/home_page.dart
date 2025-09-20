@@ -7,7 +7,8 @@ import 'package:store_app/feature/home/widgets/product_card_widgete.dart';
 import '../../../core/client.dart';
 import '../../../data/model/home_model.dart/product_model.dart';
 import '../../../data/repostories/home_repostrory.dart';
-import '../managers/product_cubit.dart';
+import '../managers/product_bloc.dart';
+import '../managers/product_event.dart';
 import '../managers/product_state.dart';
 
 class HomePage extends StatefulWidget {
@@ -22,7 +23,7 @@ class _HomePageState extends State<HomePage> {
   bool _isListening = false;
   String _text = "";
   final TextEditingController _controller = TextEditingController();
-  List<ProductModel> _allProducts = []; 
+  List<ProductModel> _allProducts = [];
 
   @override
   void initState() {
@@ -43,7 +44,7 @@ class _HomePageState extends State<HomePage> {
               TextPosition(offset: _controller.text.length),
             );
           });
-          context.read<ProductCubit>().searchProducts(_text, _allProducts);
+          context.read<ProductBloc>().add(SearchProductsEvent(_text, _allProducts));
         });
       }
     } else {
@@ -52,55 +53,45 @@ class _HomePageState extends State<HomePage> {
     }
   }
 
- @override
-Widget build(BuildContext context) {
-  return MultiBlocProvider(
-    providers: [
-      BlocProvider(
-        create: (_) => ProductCubit(ProductRepositoryImpl(ApiClient()))
-          ..loadCategories()
-          ..loadProducts(),
+  @override
+  Widget build(BuildContext context) {
+    return BlocProvider(
+      create: (_) => ProductBloc(ProductRepositoryImpl(ApiClient()))
+        ..add(LoadCategoriesEvent())
+        ..add(LoadProductsEvent()),
+      child: Scaffold(
+        appBar: const CustomAppBar(
+          title: "Discover",
+          first: "assets/notifaction.png",
+        ),
+        body: BlocBuilder<ProductBloc, ProductState>(
+          builder: (context, state) {
+            if (state.products.isNotEmpty && _allProducts.isEmpty) {
+              _allProducts = List.from(state.products);
+            }
+
+            if (state.status == ProductStatus.loading && state.products.isEmpty) {
+              return const Center(child: CircularProgressIndicator());
+            }
+
+            if (state.status == ProductStatus.failure && state.errorMessage != null) {
+              return Center(child: Text(state.errorMessage!));
+            }
+
+            return Column(
+              children: [
+                _buildSearchField(),
+                _buildCategories(state),
+                const SizedBox(height: 10),
+                _buildProductsGrid(state),
+              ],
+            );
+          },
+        ),
+        bottomNavigationBar: const BottomNavigatorNews(),
       ),
-    ],
-    child: Scaffold(
-      appBar: const CustomAppBar(
-        title: "Discover",
-        first: "assets/notifaction.png",
-      ),
-      body: BlocBuilder<ProductCubit, ProductState>(
-        builder: (context, state) {
-          if (state.products.isNotEmpty && _allProducts.isEmpty) {
-            _allProducts = List.from(state.products);
-          }
-
-          if (state.status == ProductStatus.loading &&
-              state.products.isEmpty) {
-            return const Center(child: CircularProgressIndicator());
-          }
-
-          if (state.status == ProductStatus.failure &&
-              state.errorMessage != null) {
-            return Center(child: Text(state.errorMessage!));
-          }
-
-          return Column(
-            children: [
-              _buildSearchField(),
-
-              _buildCategories(state),
-
-              const SizedBox(height: 10),
-
-              _buildProductsGrid(state),
-            ],
-          );
-        },
-      ),
-      bottomNavigationBar: const BottomNavigatorNews(),
-    ),
-  );
-}
-
+    );
+  }
 
   Widget _buildSearchField() {
     return Padding(
@@ -108,15 +99,13 @@ Widget build(BuildContext context) {
       child: TextField(
         controller: _controller,
         onChanged: (value) {
-          context.read<ProductCubit>().searchProducts(value, _allProducts);
+          context.read<ProductBloc>().add(SearchProductsEvent(value, _allProducts));
         },
         decoration: InputDecoration(
           hintText: "Search for clothes...",
-          hintStyle: TextStyle(
-              color: Theme.of(context).colorScheme.onSecondary),
+          hintStyle: TextStyle(color: Theme.of(context).colorScheme.onSecondary),
           prefixIcon: const Icon(Icons.search),
-          prefixIconColor:
-              Theme.of(context).colorScheme.onSecondary,
+          prefixIconColor: Theme.of(context).colorScheme.onSecondary,
           suffixIcon: IconButton(
             icon: Icon(
               _isListening ? Icons.mic : Icons.mic_none,
@@ -152,15 +141,15 @@ Widget build(BuildContext context) {
                 cat.title,
                 style: TextStyle(
                   color: isSelected ? Colors.white : Colors.black,
-                  fontWeight: isSelected
-                      ? FontWeight.bold
-                      : FontWeight.normal,
+                  fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
                 ),
               ),
               selected: isSelected,
               onSelected: (_) {
-                _controller.clear(); 
-                context.read<ProductCubit>().changeCategory(cat.id, _allProducts);
+                _controller.clear();
+                context
+                    .read<ProductBloc>()
+                    .add(ChangeCategoryEvent(cat.id, _allProducts));
               },
               showCheckmark: false,
               selectedColor: Colors.black,
@@ -168,9 +157,7 @@ Widget build(BuildContext context) {
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(8),
                 side: BorderSide(
-                  color: isSelected
-                      ? Colors.black
-                      : Colors.grey.shade300,
+                  color: isSelected ? Colors.black : Colors.grey.shade300,
                 ),
               ),
             ),
@@ -193,8 +180,7 @@ Widget build(BuildContext context) {
                 )
               : GridView.builder(
                   padding: const EdgeInsets.all(12),
-                  gridDelegate:
-                      const SliverGridDelegateWithFixedCrossAxisCount(
+                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                     crossAxisCount: 2,
                     mainAxisSpacing: 20,
                     crossAxisSpacing: 10,

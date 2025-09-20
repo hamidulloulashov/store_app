@@ -1,3 +1,4 @@
+// notifaction_state.dart
 import 'package:equatable/equatable.dart';
 import '../../../data/model/notifaction/notifaction_model.dart';
 

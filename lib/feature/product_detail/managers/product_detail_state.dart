@@ -1,19 +1,29 @@
+import 'package:equatable/equatable.dart';
 import '../../../data/model/home_model.dart/product_detail_model.dart';
 
-abstract class ProductDetailState {}
+sealed class ProductDetailState extends Equatable {
+  const ProductDetailState();
 
-class ProductDetailInitial extends ProductDetailState {}
-
-class ProductDetailLoading extends ProductDetailState {}
-
-class ProductDetailLoaded extends ProductDetailState {
-  final ProductDetailModel product;
-
-  ProductDetailLoaded(this.product);
+  @override
+  List<Object?> get props => [];
 }
 
-class ProductDetailError extends ProductDetailState {
-  final String message;
+final class ProductDetailInitial extends ProductDetailState {}
 
-  ProductDetailError(this.message);
+final class ProductDetailLoading extends ProductDetailState {}
+
+final class ProductDetailLoaded extends ProductDetailState {
+  final ProductDetailModel product;
+  const ProductDetailLoaded(this.product);
+
+  @override
+  List<Object?> get props => [product];
+}
+
+final class ProductDetailError extends ProductDetailState {
+  final String message;
+  const ProductDetailError(this.message);
+
+  @override
+  List<Object?> get props => [message];
 }

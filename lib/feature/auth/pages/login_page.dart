@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import 'package:store_app/feature/auth/managers/aut/login_event.dart';
+import 'package:store_app/feature/auth/managers/aut/login_state.dart';
 import 'package:store_app/feature/common/widget/custom_appbar.dart';
-import '../managers/aut/login_cubit.dart';
-import '../managers/aut/login_state.dart';
+import '../managers/aut/login_bloc.dart'; // Bu faylda hamma narsa bor
 import '../widgets/register_widget.dart.dart';
 
 class LoginPage extends StatefulWidget {
@@ -52,8 +53,8 @@ class _LoginPageState extends State<LoginPage> {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (_) => LoginCubit(),
-      child: BlocConsumer<LoginCubit, LoginState>(
+      create: (_) => LoginBloc(),
+      child: BlocConsumer<LoginBloc, LoginState>(
         listener: (context, state) {
           if (state.errorMessage != null) {
             ScaffoldMessenger.of(context).showSnackBar(
@@ -63,10 +64,16 @@ class _LoginPageState extends State<LoginPage> {
               ),
             );
           }
+          
+          // Success state uchun listener
+          if (state.isSuccess && mounted) {
+            setState(() {
+              _isLoggedIn = true;
+            });
+            GoRouter.of(context).go("/home");
+          }
         },
         builder: (context, state) {
-          final loginCubit = context.read<LoginCubit>();
-
           return Scaffold(
             appBar: CustomAppBar(),
             body: SafeArea(
@@ -81,7 +88,7 @@ class _LoginPageState extends State<LoginPage> {
                       style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
                     ),
                     const SizedBox(height: 8),
-                    const Text("It’s great to see you again."),
+                    const Text("It's great to see you again."),
                     const SizedBox(height: 32),
 
                     CustomTextField(
@@ -138,21 +145,17 @@ class _LoginPageState extends State<LoginPage> {
                           ? const Center(child: CircularProgressIndicator())
                           : ElevatedButton(
                               onPressed: _isFormValid
-                                  ? () async {
+                                  ? () {
                                       _validateFields();
 
                                       if (_isFormValid) {
-                                        final success = await loginCubit.login(
-                                          _loginController.text.trim(),
-                                          _passwordController.text.trim(),
+                                        // Event yuboramiz
+                                        context.read<LoginBloc>().add(
+                                          LoginSubmitted(
+                                            login: _loginController.text.trim(),
+                                            password: _passwordController.text.trim(),
+                                          ),
                                         );
-
-                                        if (success && mounted) {
-                                          setState(() {
-                                            _isLoggedIn = true;
-                                          });
-                                          GoRouter.of(context).go("/home");
-                                        }
                                       }
                                     }
                                   : null,

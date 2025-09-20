@@ -10,7 +10,7 @@ import 'package:store_app/feature/auth/onboarding/pages/onboarding_page.dart';
 import 'package:store_app/feature/auth/onboarding/pages/splash_page.dart';
 import 'package:store_app/feature/notifacton/pages/notifacton_page.dart';
  final GoRouter router = GoRouter(
-    initialLocation: Routes.splash,
+    initialLocation: Routes.home,
     routes: [
       GoRoute(
         path: Routes.splash,

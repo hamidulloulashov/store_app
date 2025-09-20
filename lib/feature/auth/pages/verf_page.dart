@@ -1,9 +1,8 @@
-// verify_code_page.dart
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:store_app/feature/common/widget/custom_appbar.dart';
-import '../managers/forgot/forgot_cubit.dart';
+import '../managers/forgot/forgot_bloc.dart';
 import '../managers/forgot/forgot_state.dart';
 import 'reset_password_page.dart';
 
@@ -13,8 +12,8 @@ class VerifyCodePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider<ForgotPasswordCubit>(
-      create: (_) => ForgotPasswordCubit()..setEmail(email),
+    return BlocProvider<ForgotPasswordBloc>(
+      create: (_) => ForgotPasswordBloc()..setEmail(email),
       child: _VerifyCodeView(email: email),
     );
   }
@@ -49,30 +48,30 @@ class _VerifyCodePageState extends State<_VerifyCodeView> {
   }
 
   void _verifyCode() async {
-    final cubit = context.read<ForgotPasswordCubit>();
-    cubit.setCode(code);
-
-    final success = await cubit.verifyCode();
-    if (success && mounted) {
-      Navigator.push(
-        context,
-        ResetPasswordPage.route(cubit), 
-      );
-    } else if (mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(cubit.state.errorMessage ?? "Invalid code"),
-          backgroundColor: Theme.of(context).colorScheme.error,
-        ),
-      );
-      for (var controller in _controllers) controller.clear();
-      _focusNodes[0].requestFocus();
-    }
+    // Helper method ishlatamiz
+    await context.read<ForgotPasswordBloc>().verifyCode(code);
   }
 
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<ForgotPasswordCubit, ForgotPasswordState>(
+    return BlocConsumer<ForgotPasswordBloc, ForgotPasswordState>(
+      listener: (context, state) {
+        if (state.isCodeVerified && mounted) {
+          Navigator.push(
+            context,
+            ResetPasswordPage.route(context.read<ForgotPasswordBloc>()),
+          );
+        } else if (state.errorMessage != null && !state.isLoading) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(state.errorMessage!),
+              backgroundColor: Theme.of(context).colorScheme.error,
+            ),
+          );
+          for (var controller in _controllers) controller.clear();
+          _focusNodes[0].requestFocus();
+        }
+      },
       builder: (context, state) {
         return Scaffold(
           backgroundColor: Theme.of(context).colorScheme.background,
@@ -148,7 +147,8 @@ class _VerifyCodePageState extends State<_VerifyCodeView> {
                       ),
                       GestureDetector(
                         onTap: () async {
-                          await context.read<ForgotPasswordCubit>().sendResetCode();
+                          // Resend code - helper method
+                          await context.read<ForgotPasswordBloc>().sendResetCode(widget.email);
                           if (mounted) {
                             ScaffoldMessenger.of(context).showSnackBar(
                               const SnackBar(content: Text("Code resent successfully")),

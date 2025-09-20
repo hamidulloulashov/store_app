@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:store_app/feature/auth/managers/forgot/forgot_bloc.dart' show ForgotPasswordBloc;
 import 'package:store_app/feature/common/widget/custom_appbar.dart';
-import '../managers/forgot/forgot_cubit.dart';
+
+import '../managers/forgot/forgot_event.dart';
 import '../managers/forgot/forgot_state.dart';
 
 class ResetPasswordPage extends StatefulWidget {
@@ -10,11 +12,11 @@ class ResetPasswordPage extends StatefulWidget {
   @override
   State<ResetPasswordPage> createState() => _ResetPasswordPageState();
 
-  // Navigator orqali cubit uzatish uchun helper
-  static Route route(ForgotPasswordCubit cubit) {
+  // Navigator orqali BLOC uzatish uchun helper
+  static Route route(ForgotPasswordBloc bloc) {
     return MaterialPageRoute(
       builder: (_) => BlocProvider.value(
-        value: cubit,
+        value: bloc,
         child: const ResetPasswordPage(),
       ),
     );
@@ -38,7 +40,19 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
 
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<ForgotPasswordCubit, ForgotPasswordState>(
+    return BlocConsumer<ForgotPasswordBloc, ForgotPasswordState>(
+      listener: (context, state) {
+        if (state.isPasswordReset && mounted) {
+          _showSuccessDialog();
+        } else if (state.errorMessage != null && !state.isLoading) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(state.errorMessage!),
+              backgroundColor: Theme.of(context).colorScheme.error,
+            ),
+          );
+        }
+      },
       builder: (context, state) {
         return Scaffold(
           resizeToAvoidBottomInset: false,
@@ -111,20 +125,12 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
                       child: ElevatedButton(
                         onPressed: state.isLoading
                             ? null
-                            : () async {
+                            : () {
                                 if (_formKey.currentState!.validate()) {
-                                  final success = await context.read<ForgotPasswordCubit>().resetPassword(
-                                        _passwordController.text,
-                                      );
-                                  if (success && mounted) _showSuccessDialog();
-                                  else if (mounted) {
-                                    ScaffoldMessenger.of(context).showSnackBar(
-                                      SnackBar(
-                                        content: Text(state.errorMessage ?? "Error resetting password"),
-                                        backgroundColor: Theme.of(context).colorScheme.error,
-                                      ),
-                                    );
-                                  }
+                                  // Event yuboramiz
+                                  context.read<ForgotPasswordBloc>().add(
+                                    ResetPasswordRequested(newPassword: _passwordController.text),
+                                  );
                                 }
                               },
                         style: ElevatedButton.styleFrom(

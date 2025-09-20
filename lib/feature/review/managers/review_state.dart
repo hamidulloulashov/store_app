@@ -1,29 +1,29 @@
 import 'package:equatable/equatable.dart';
 import '../../../data/model/home_model.dart/review_model.dart';
 
-abstract class ReviewState extends Equatable {
+sealed class ReviewState extends Equatable {
+  const ReviewState();
+
   @override
-  List<Object> get props => [];
+  List<Object?> get props => [];
 }
 
-class ReviewInitial extends ReviewState {}
+final class ReviewInitial extends ReviewState {}
 
-class ReviewLoading extends ReviewState {}
+final class ReviewLoading extends ReviewState {}
 
-class ReviewLoaded extends ReviewState {
+final class ReviewLoaded extends ReviewState {
   final List<ReviewModel> reviews;
-
-  ReviewLoaded(this.reviews);
+  const ReviewLoaded(this.reviews);
 
   @override
-  List<Object> get props => [reviews];
+  List<Object?> get props => [reviews];
 }
 
-class ReviewError extends ReviewState {
+final class ReviewError extends ReviewState {
   final String message;
-
-  ReviewError(this.message);
+  const ReviewError(this.message);
 
   @override
-  List<Object> get props => [message];
+  List<Object?> get props => [message];
 }

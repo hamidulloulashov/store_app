@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import 'package:store_app/feature/auth/managers/aut/register_event.dart' show RegisterSubmitted;
+import 'package:store_app/feature/auth/managers/aut/register_state.dart' show RegisterState;
 import 'package:store_app/feature/common/widget/custom_appbar.dart';
-import '../managers/aut/register_cubit.dart';
-import '../managers/aut/register_state.dart';
+import '../managers/aut/register_bloc.dart'; 
 import '../widgets/register_widget.dart.dart';
+
 class RegisterPage extends StatefulWidget {
   const RegisterPage({super.key});
 
@@ -59,18 +61,26 @@ class _RegisterPageState extends State<RegisterPage> {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (_) => RegisterCubit(),
-      child: BlocConsumer<RegisterCubit, RegisterState>(
+      create: (_) => RegisterBloc(),
+      child: BlocConsumer<RegisterBloc, RegisterState>(
         listener: (context, state) {
           if (state.errorMessage != null) {
             ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text(state.errorMessage!)),
+              SnackBar(
+                content: Text(state.errorMessage!),
+                backgroundColor: Theme.of(context).colorScheme.error,
+              ),
             );
+          }
+
+          if (state.isSuccess && mounted) {
+            setState(() {
+              _isRegistered = true;
+            });
+            GoRouter.of(context).go("/home");
           }
         },
         builder: (context, state) {
-          final registerCubit = context.read<RegisterCubit>();
-
           return Scaffold(
             appBar: CustomAppBar(),
             body: SafeArea(
@@ -126,7 +136,6 @@ class _RegisterPageState extends State<RegisterPage> {
                     ),
                     const SizedBox(height: 20),
 
-                    // Submit
                     SizedBox(
                       width: double.infinity,
                       height: 50,
@@ -134,21 +143,16 @@ class _RegisterPageState extends State<RegisterPage> {
                           ? const Center(child: CircularProgressIndicator())
                           : ElevatedButton(
                               onPressed: _isFormValid
-                                  ? () async {
+                                  ? () {
                                       _validateFields();
                                       if (_isFormValid) {
-                                        final success = await registerCubit.register(
-                                          fullName: _fullNameController.text.trim(),
-                                          email: _emailController.text.trim(),
-                                          password: _passwordController.text.trim(),
+                                        context.read<RegisterBloc>().add(
+                                          RegisterSubmitted(
+                                            fullName: _fullNameController.text.trim(),
+                                            email: _emailController.text.trim(),
+                                            password: _passwordController.text.trim(),
+                                          ),
                                         );
-
-                                        if (success && mounted) {
-                                          setState(() {
-                                            _isRegistered = true;
-                                          });
-                                          GoRouter.of(context).go("/home");
-                                        }
                                       }
                                     }
                                   : null,
@@ -189,6 +193,13 @@ class _RegisterPageState extends State<RegisterPage> {
                       height: 50,
                       child: OutlinedButton.icon(
                         onPressed: () {},
+                        style: OutlinedButton.styleFrom(
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          side: BorderSide(
+                              color: Theme.of(context).colorScheme.inverseSurface),
+                        ),
                         icon: Image.asset("assets/google.png", height: 24),
                         label: Text(
                           "Sign Up with Google",

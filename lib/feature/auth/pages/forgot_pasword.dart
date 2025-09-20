@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:store_app/feature/auth/pages/verf_page.dart';
+import 'package:store_app/feature/auth/pages/verf_page.dart' show VerifyCodePage;
 import 'package:store_app/feature/common/widget/custom_appbar.dart';
 
-import '../managers/forgot/forgot_cubit.dart';
+import '../managers/forgot/forgot_bloc.dart';
+import '../managers/forgot/forgot_event.dart';
 import '../managers/forgot/forgot_state.dart';
 
 class ForgotPasswordPage extends StatelessWidget {
@@ -12,7 +13,7 @@ class ForgotPasswordPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (_) => ForgotPasswordCubit(),
+      create: (_) => ForgotPasswordBloc(),
       child: const _ForgotPasswordView(),
     );
   }
@@ -37,7 +38,17 @@ class _ForgotPasswordViewState extends State<_ForgotPasswordView> {
 
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<ForgotPasswordCubit, ForgotPasswordState>(
+    return BlocConsumer<ForgotPasswordBloc, ForgotPasswordState>(
+      listener: (context, state) {
+        if (state.isCodeSent && mounted) {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (_) => VerifyCodePage(email: _emailController.text.trim()),
+            ),
+          );
+        }
+      },
       builder: (context, state) {
         return Scaffold(
           backgroundColor: Theme.of(context).colorScheme.background,
@@ -121,6 +132,16 @@ class _ForgotPasswordViewState extends State<_ForgotPasswordView> {
                         filled: true,
                       ),
                     ),
+                    if (state.errorMessage != null) ...[
+                      const SizedBox(height: 8),
+                      Text(
+                        state.errorMessage!,
+                        style: TextStyle(
+                          color: Theme.of(context).colorScheme.error,
+                          fontSize: 12,
+                        ),
+                      ),
+                    ],
                     const Spacer(),
                     SizedBox(
                       width: double.infinity,
@@ -128,25 +149,11 @@ class _ForgotPasswordViewState extends State<_ForgotPasswordView> {
                       child: ElevatedButton(
                         onPressed: state.isLoading
                             ? null
-                            : () async {
+                            : () {
                                 if (_formKey.currentState!.validate()) {
-                                  final cubit = context.read<ForgotPasswordCubit>();
-                                  final success = await cubit.sendResetCode(_emailController.text.trim());
-                                  if (success && mounted) {
-                                    Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder: (_) => VerifyCodePage(email: _emailController.text.trim()),
-                                      ),
-                                    );
-                                  } else if (mounted) {
-                                    ScaffoldMessenger.of(context).showSnackBar(
-                                      SnackBar(
-                                        content: Text(state.errorMessage ?? "Failed to send code"),
-                                        backgroundColor: Theme.of(context).colorScheme.error,
-                                      ),
-                                    );
-                                  }
+                                  context.read<ForgotPasswordBloc>().add(
+                                    SendResetCodeRequested(email: _emailController.text.trim()),
+                                  );
                                 }
                               },
                         style: ElevatedButton.styleFrom(

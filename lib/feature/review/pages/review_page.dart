@@ -1,24 +1,23 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:store_app/data/model/home_model.dart/review_model.dart' show ReviewModel;
+import 'package:store_app/data/model/home_model.dart/review_model.dart';
 import 'package:store_app/feature/common/widget/custom_appbar.dart';
 import '../../../core/client.dart';
 import '../../../data/repostories/rews_repository.dart';
-import '../managers/review_cubit.dart';
+import '../managers/review_bloc.dart';
+import '../managers/review_event.dart';
 import '../managers/review_state.dart';
+
 class ReviewPage extends StatelessWidget {
   final int productId;
   const ReviewPage({super.key, required this.productId});
+
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (context) {
-        final cubit = ReviewCubit(
-          ReviewRepository(apiClient: context.read<ApiClient>()),
-        );
-        cubit.getReviews(productId);
-        return cubit;
-      },
+      create: (context) => ReviewBloc(
+        ReviewRepository(apiClient: context.read<ApiClient>()),
+      )..add(FetchReviews(productId)),
       child: Scaffold(
         backgroundColor: Theme.of(context).scaffoldBackgroundColor,
         appBar: CustomAppBar(
@@ -26,7 +25,7 @@ class ReviewPage extends StatelessWidget {
           arrow: "assets/arrow.png",
           first: "assets/notifaction.png",
         ),
-        body: BlocBuilder<ReviewCubit, ReviewState>(
+        body: BlocBuilder<ReviewBloc, ReviewState>(
           builder: (context, state) {
             if (state is ReviewInitial || state is ReviewLoading) {
               return const Center(child: CircularProgressIndicator());
@@ -69,7 +68,7 @@ class ReviewPage extends StatelessWidget {
                     const SizedBox(height: 16),
                     ElevatedButton(
                       onPressed: () {
-                        context.read<ReviewCubit>().getReviews(productId);
+                        context.read<ReviewBloc>().add(FetchReviews(productId));
                       },
                       child: const Text('Qayta urinish'),
                     ),
@@ -77,7 +76,7 @@ class ReviewPage extends StatelessWidget {
                 ),
               );
             }
-            return const SizedBox();
+            return const SizedBox.shrink();
           },
         ),
       ),
@@ -88,7 +87,6 @@ class ReviewPage extends StatelessWidget {
     double average = reviews.isNotEmpty
         ? reviews.map((r) => r.rating).reduce((a, b) => a + b) / reviews.length
         : 0;
-
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return Padding(
@@ -113,8 +111,8 @@ class ReviewPage extends StatelessWidget {
                   children: List.generate(5, (index) {
                     return Icon(
                       Icons.star,
-                      color: index < average.round() 
-                          ? Colors.orange 
+                      color: index < average.round()
+                          ? Colors.orange
                           : (isDark ? Colors.grey[600] : Colors.grey[300]),
                       size: 20,
                     );
@@ -125,7 +123,11 @@ class ReviewPage extends StatelessWidget {
                   '${reviews.length} Ratings',
                   style: TextStyle(
                     fontSize: 14,
-                    color: Theme.of(context).textTheme.bodyMedium?.color?.withOpacity(0.7),
+                    color: Theme.of(context)
+                        .textTheme
+                        .bodyMedium
+                        ?.color
+                        ?.withOpacity(0.7),
                   ),
                 ),
               ],
@@ -137,8 +139,6 @@ class ReviewPage extends StatelessWidget {
   }
 
   Widget _buildRatingDistribution(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20),
       child: Column(
@@ -155,7 +155,7 @@ class ReviewPage extends StatelessWidget {
 
   Widget _buildRatingBar(BuildContext context, int stars, double percentage) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    
+
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 2),
       child: Row(
@@ -204,108 +204,75 @@ class ReviewPage extends StatelessWidget {
   }
 
   Widget _buildReviewsList(BuildContext context, List<ReviewModel> reviews) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Container(
       color: Theme.of(context).colorScheme.surface,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: reviews.map((review) {
+          return Container(
+            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
+            decoration: BoxDecoration(
+              color: Theme.of(context).colorScheme.surface,
+              border: Border(
+                bottom: BorderSide(
+                  color: isDark ? Colors.grey[700]! : Colors.grey[200]!,
+                  width: 1,
+                ),
+              ),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+                Row(
+                  children: List.generate(5, (index) {
+                    return Icon(
+                      Icons.star,
+                      color: index < review.rating.round()
+                          ? Colors.orange
+                          : (isDark ? Colors.grey[600] : Colors.grey[300]),
+                      size: 16,
+                    );
+                  }),
+                ),
+                const SizedBox(height: 8),
                 Text(
-                  '${reviews.length} Reviews',
+                  review.comment,
                   style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w600,
-                    color: Theme.of(context).textTheme.headlineSmall?.color,
+                    fontSize: 14,
+                    color: Theme.of(context).textTheme.bodyLarge?.color,
+                    height: 1.4,
                   ),
                 ),
+                const SizedBox(height: 12),
                 Row(
                   children: [
                     Text(
-                      'Most Relevant',
+                      review.userFullName,
                       style: TextStyle(
-                        fontSize: 14,
-                        color: Theme.of(context).textTheme.bodyMedium?.color?.withOpacity(0.7),
+                        fontSize: 12,
+                        fontWeight: FontWeight.w500,
+                        color: Theme.of(context).textTheme.bodyMedium?.color,
                       ),
                     ),
-                    Icon(
-                      Icons.keyboard_arrow_down,
-                      color: Theme.of(context).textTheme.bodyMedium?.color?.withOpacity(0.7),
-                      size: 20,
+                    const SizedBox(width: 8),
+                    Text(
+                      '• ${_formatDate(review.created)}',
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: Theme.of(context)
+                            .textTheme
+                            .bodyMedium
+                            ?.color
+                            ?.withOpacity(0.6),
+                      ),
                     ),
                   ],
                 ),
               ],
             ),
-          ),
-          ...reviews.map((review) => _buildReviewItem(context, review)).toList(),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildReviewItem(BuildContext context, ReviewModel review) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
-      decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.surface,
-        border: Border(
-          bottom: BorderSide(
-            color: isDark ? Colors.grey[700]! : Colors.grey[200]!, 
-            width: 1,
-          ),
-        ),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: List.generate(5, (index) {
-              return Icon(
-                Icons.star,
-                color: index < review.rating.round() 
-                    ? Colors.orange 
-                    : (isDark ? Colors.grey[600] : Colors.grey[300]),
-                size: 16,
-              );
-            }),
-          ),
-          const SizedBox(height: 8),
-          Text(
-            review.comment,
-            style: TextStyle(
-              fontSize: 14,
-              color: Theme.of(context).textTheme.bodyLarge?.color,
-              height: 1.4,
-            ),
-          ),
-          const SizedBox(height: 12),
-          Row(
-            children: [
-              Text(
-                review.userFullName,
-                style: TextStyle(
-                  fontSize: 12,
-                  fontWeight: FontWeight.w500,
-                  color: Theme.of(context).textTheme.bodyMedium?.color,
-                ),
-              ),
-              const SizedBox(width: 8),
-              Text(
-                '• ${_formatDate(review.created)}',
-                style: TextStyle(
-                  fontSize: 12,
-                  color: Theme.of(context).textTheme.bodyMedium?.color?.withOpacity(0.6),
-                ),
-              ),
-            ],
-          ),
-        ],
+          );
+        }).toList(),
       ),
     );
   }
@@ -313,11 +280,9 @@ class ReviewPage extends StatelessWidget {
   String _formatDate(DateTime date) {
     final now = DateTime.now();
     final difference = now.difference(date);
-    
+
     if (difference.inDays < 1) {
-      if (difference.inHours < 1) {
-        return '${difference.inMinutes} minutes ago';
-      }
+      if (difference.inHours < 1) return '${difference.inMinutes} minutes ago';
       return '${difference.inHours} hours ago';
     } else if (difference.inDays < 7) {
       return '${difference.inDays} days ago';
