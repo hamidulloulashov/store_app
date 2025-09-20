@@ -21,11 +21,9 @@ class SavedBloc extends Bloc<SavedEvent, SavedState> {
     on<ClearAllSavedProducts>(_onClearAllSavedProducts);
     on<FetchSavedProducts>(_onFetchSavedProducts);
 
-    // Initial load
     add(const LoadSavedProducts());
   }
 
-  // Helper methods - kodga o'zgartirish kiritmaydi
   Future<void> fetchSavedProduct() async {
     add(const FetchSavedProducts());
   }
@@ -38,7 +36,6 @@ class SavedBloc extends Bloc<SavedEvent, SavedState> {
     add(const ClearAllSavedProducts());
   }
 
-  // Event handlers
   Future<void> _onLoadSavedProducts(
     LoadSavedProducts event,
     Emitter<SavedState> emit,

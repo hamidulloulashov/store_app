@@ -5,7 +5,6 @@ import 'package:store_app/core/dependencies.dart' show dependencies;
 import 'package:store_app/feature/common/managers/theme_bloc.dart' show ThemeBloc, ThemeState;
 import 'core/router/router.dart' as AppRouter;
 import 'core/utils/app_theme.dart';
-
 void main() {
   runApp(
     MultiProvider(
@@ -14,10 +13,8 @@ void main() {
     ),
   );
 }
-
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
-
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<ThemeBloc, ThemeState>(

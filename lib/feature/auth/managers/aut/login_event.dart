@@ -28,4 +28,3 @@ class LoginClearState extends LoginEvent {
   const LoginClearState();
 }
 
-// ===== STATE =====

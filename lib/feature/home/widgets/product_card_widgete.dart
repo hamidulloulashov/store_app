@@ -15,12 +15,13 @@ class ProductCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () {
-        Navigator.of(context).push(
-          MaterialPageRoute(
-            builder: (_) => ProductDetailPage(productId: product.id),
-          ),
-        );
-      },
+  Navigator.of(context).push(
+    MaterialPageRoute(
+      builder: (_) => ProductDetailWithReviewsPage(productId: product.id),
+    ),
+  );
+},
+
       child: Container(
         decoration: BoxDecoration(
           color: Colors.white,
