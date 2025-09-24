@@ -1,5 +1,5 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
-import '../../../data/repostories/home_repostrory.dart';
+import '../../../../data/repostories/home_repostrory.dart';
 import 'product_detail_event.dart';
 import 'product_detail_state.dart';
 

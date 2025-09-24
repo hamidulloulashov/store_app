@@ -1,6 +1,6 @@
 import 'package:store_app/core/client.dart' show ApiClient;
 
-import '../model/home_model.dart/product_detail_model.dart';
+import '../model/home/product_detail_model.dart';
 class ProductRepository {
   final ApiClient _apiClient;
 

@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
-import 'package:store_app/feature/auth/managers/aut/register_event.dart' show RegisterSubmitted;
-import 'package:store_app/feature/auth/managers/aut/register_state.dart' show RegisterState;
+import 'package:store_app/feature/auth/managers/register/register_event.dart' show RegisterSubmitted;
+import 'package:store_app/feature/auth/managers/register/register_state.dart' show RegisterState;
 import 'package:store_app/feature/common/widget/custom_appbar.dart';
-import '../managers/aut/register_bloc.dart'; 
+import '../managers/register/register_bloc.dart'; 
 import '../widgets/register_widget.dart.dart';
 
 class RegisterPage extends StatefulWidget {

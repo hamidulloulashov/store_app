@@ -4,10 +4,11 @@ import 'package:store_app/core/result.dart';
 
 class ApiClient {
   final Dio _dio;
+
   ApiClient()
       : _dio = Dio(
           BaseOptions(
-            baseUrl: "http://192.168.8.168:8888/api/v1",
+            baseUrl: "http://192.168.10.50:8888/api/v1",
             connectTimeout: const Duration(seconds: 10),
             receiveTimeout: const Duration(seconds: 15),
             headers: {
@@ -56,6 +57,46 @@ class ApiClient {
     try {
       final response =
           await _dio.post(path, data: data, queryParameters: queryParams);
+      if (response.statusCode! >= 200 && response.statusCode! < 300) {
+        return Result.ok(response.data as T);
+      } else {
+        return Result.error(Exception("Server error: ${response.statusCode}"));
+      }
+    } on DioException catch (dioError) {
+      return Result.error(Exception(_handleDioError(dioError)));
+    } catch (e) {
+      return Result.error(Exception(e.toString()));
+    }
+  }
+
+  Future<Result<T>> delete<T>(
+    String path, {
+    dynamic data,
+    Map<String, dynamic>? queryParams,
+  }) async {
+    try {
+      final response =
+          await _dio.delete(path, data: data, queryParameters: queryParams);
+      if (response.statusCode! >= 200 && response.statusCode! < 300) {
+        return Result.ok(response.data as T);
+      } else {
+        return Result.error(Exception("Server error: ${response.statusCode}"));
+      }
+    } on DioException catch (dioError) {
+      return Result.error(Exception(_handleDioError(dioError)));
+    } catch (e) {
+      return Result.error(Exception(e.toString()));
+    }
+  }
+
+  Future<Result<T>> put<T>(
+    String path, {
+    dynamic data,
+    Map<String, dynamic>? queryParams,
+  }) async {
+    try {
+      final response =
+          await _dio.put(path, data: data, queryParameters: queryParams);
       if (response.statusCode! >= 200 && response.statusCode! < 300) {
         return Result.ok(response.data as T);
       } else {

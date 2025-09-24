@@ -22,24 +22,25 @@ class BottomNavigatorNews extends StatelessWidget {
   }
 
   void _onItemTapped(BuildContext context, int index) {
-    switch (index) {
-      case 0:
-        context.go('/home');
-        break;
-      case 1:
-        // context.go('/search');
-        break;
-      case 2:
-        context.go('/save');
-        break;
-      case 3:
-        // context.go('/shop');
-        break;
-      case 4:
-        // context.go('/profile');
-        break;
-    }
+  switch (index) {
+    case 0:
+      context.push('/home');   
+      break;
+    case 1:
+      context.push('/search');
+      break;
+    case 2:
+      context.push('/save');
+      break;
+    case 3:
+      context.push('/cart');
+      break;
+    case 4:
+      context.push('/profile');
+      break;
   }
+}
+
 
   @override
   Widget build(BuildContext context) {

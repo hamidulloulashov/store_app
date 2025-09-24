@@ -1,19 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 import 'package:speech_to_text/speech_to_text.dart' as stt;
 import 'package:store_app/feature/common/widget/bottom_navigator.dart';
 import 'package:store_app/feature/common/widget/custom_appbar.dart';
+import 'package:store_app/feature/home/pages/sort_page.dart' show FilterBottomSheet;
 import 'package:store_app/feature/home/widgets/product_card_widgete.dart';
 import '../../../core/client.dart';
-import '../../../data/model/home_model.dart/product_model.dart';
+import '../../../data/model/home/product_model.dart';
 import '../../../data/repostories/home_repostrory.dart';
-import '../managers/product_bloc.dart';
-import '../managers/product_event.dart';
-import '../managers/product_state.dart';
-
+import '../managers/home/product_bloc.dart';
+import '../managers/home/product_event.dart';
+import '../managers/home/product_state.dart';
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
-
   @override
   State<HomePage> createState() => _HomePageState();
 }
@@ -93,35 +93,79 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  Widget _buildSearchField() {
-    return Padding(
-      padding: const EdgeInsets.all(12.0),
-      child: TextField(
-        controller: _controller,
-        onChanged: (value) {
-          context.read<ProductBloc>().add(SearchProductsEvent(value, _allProducts));
-        },
-        decoration: InputDecoration(
-          hintText: "Search for clothes...",
-          hintStyle: TextStyle(color: Theme.of(context).colorScheme.onSecondary),
-          prefixIcon: const Icon(Icons.search),
-          prefixIconColor: Theme.of(context).colorScheme.onSecondary,
-          suffixIcon: IconButton(
-            icon: Icon(
-              _isListening ? Icons.mic : Icons.mic_none,
-              color: _isListening ? Colors.red : Colors.black,
+ Widget _buildSearchField() {
+  return Padding(
+    padding: const EdgeInsets.all(12.0),
+    child: Row(
+      children: [
+        Expanded(
+          child: GestureDetector(
+            onTap: () {
+  final bloc = context.read<ProductBloc>();
+  context.push(
+    '/search',
+    extra: {
+      'bloc': bloc,
+      'allProducts': _allProducts,
+    },
+  );
+},
+
+            child: AbsorbPointer(
+              child: TextField(
+                controller: _controller,
+                decoration: InputDecoration(
+                  hintText: "Search for clothes...",
+                  hintStyle: TextStyle(
+                      color: Theme.of(context).colorScheme.onSecondary),
+                  prefixIcon: const Icon(Icons.search),
+                  prefixIconColor:
+                      Theme.of(context).colorScheme.onSecondary,
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  filled: true,
+                  fillColor: Colors.grey[100],
+                ),
+              ),
             ),
-            onPressed: _listen,
           ),
-          border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(12),
-          ),
-          filled: true,
-          fillColor: Colors.grey[100],
         ),
-      ),
-    );
-  }
+        const SizedBox(width: 8),
+        GestureDetector(
+          onTap: ()async{
+            final bloc = context.read<ProductBloc>();
+            await showModalBottomSheet(
+  context: context,
+  isScrollControlled: true,
+  builder: (context) => BlocProvider.value(
+    value: bloc, 
+    child: FilterBottomSheet(
+      currentCategoryId: null,
+      currentSizeId: null,
+      currentTitle: null,
+      currentMinPrice: null,
+      currentMaxPrice: null,
+      currentOrderBy: null,
+    ),
+  ),
+);
+
+
+          },
+          child: Image.asset(
+            'assets/sort.png',
+            width: 36,
+            height: 36,
+          ),
+        ),
+      ],
+    ),
+  );
+}
+
+
+
 
   Widget _buildCategories(ProductState state) {
     return SizedBox(

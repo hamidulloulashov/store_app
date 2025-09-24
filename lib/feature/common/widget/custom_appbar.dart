@@ -39,21 +39,22 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
               Theme.of(context).appBarTheme.backgroundColor,
           bottom: bottom,
           leading: arrow != null
-              ? GestureDetector(
-                  onTap: () {
-                    if (Navigator.of(context).canPop()) Navigator.of(context).pop();
-                  },
-                  child: Padding(
-                    padding: const EdgeInsets.all(19),
-                    child: Image.asset(
-                      arrow!,
-                      width: 24,
-                      height: 24,
-                      color: Theme.of(context).colorScheme.inverseSurface,
-                    ),
-                  ),
-                )
-              : null,
+    ? GestureDetector(
+        onTap: () {
+          context.go('/home'); 
+        },
+        child: Padding(
+          padding: const EdgeInsets.all(19),
+          child: Image.asset(
+            arrow!,
+            width: 24,
+            height: 24,
+            color: Theme.of(context).colorScheme.inverseSurface,
+          ),
+        ),
+      )
+    : null,
+
           title: title != null
               ? Center(
                   child: Text(

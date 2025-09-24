@@ -1,5 +1,5 @@
 import '../../core/client.dart';
-import '../model/home_model.dart/product_model.dart';
+import '../model/home/product_model.dart';
 
 class ProductRepositories {
   final ApiClient _client;

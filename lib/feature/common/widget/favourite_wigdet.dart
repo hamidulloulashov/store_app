@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import '../../../data/model/home_model.dart/product_model.dart';
+import '../../../data/model/home/product_model.dart';
 import '../managers/save_bloc.dart';
 import '../managers/save_state.dart';
 

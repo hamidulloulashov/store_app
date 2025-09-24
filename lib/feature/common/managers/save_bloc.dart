@@ -5,7 +5,7 @@ import 'package:shared_preferences/shared_preferences.dart' show SharedPreferenc
 import 'package:store_app/data/repostories/favourite_repository.dart' show ProductRepositories;
 import 'package:store_app/feature/common/managers/save_state.dart' show SavedState;
 
-import '../../../data/model/home_model.dart/product_model.dart';
+import '../../../data/model/home/product_model.dart';
 import 'save_event.dart';
 
 class SavedBloc extends Bloc<SavedEvent, SavedState> {
@@ -115,7 +115,6 @@ class SavedBloc extends Bloc<SavedEvent, SavedState> {
 
     emit(state.copyWith(savedProduct: currentList));
     
-    // Save to SharedPreferences
     await _saveSavedProducts(currentList);
   }
 

@@ -17,7 +17,7 @@ class MyApp extends StatelessWidget {
   const MyApp({super.key});
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<ThemeBloc, ThemeState>(
+    return BlocBuilder<ThemeBloc, ThemeState>(  
       builder: (context, state) {
         return MaterialApp.router(
           debugShowCheckedModeBanner: false,

@@ -48,7 +48,6 @@ class _VerifyCodePageState extends State<_VerifyCodeView> {
   }
 
   void _verifyCode() async {
-    // Helper method ishlatamiz
     await context.read<ForgotPasswordBloc>().verifyCode(code);
   }
 
@@ -147,7 +146,6 @@ class _VerifyCodePageState extends State<_VerifyCodeView> {
                       ),
                       GestureDetector(
                         onTap: () async {
-                          // Resend code - helper method
                           await context.read<ForgotPasswordBloc>().sendResetCode(widget.email);
                           if (mounted) {
                             ScaffoldMessenger.of(context).showSnackBar(

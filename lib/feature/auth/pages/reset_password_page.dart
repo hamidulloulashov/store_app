@@ -2,17 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:store_app/feature/auth/managers/forgot/forgot_bloc.dart' show ForgotPasswordBloc;
 import 'package:store_app/feature/common/widget/custom_appbar.dart';
-
 import '../managers/forgot/forgot_event.dart';
 import '../managers/forgot/forgot_state.dart';
-
 class ResetPasswordPage extends StatefulWidget {
   const ResetPasswordPage({super.key});
-
   @override
   State<ResetPasswordPage> createState() => _ResetPasswordPageState();
 
-  // Navigator orqali BLOC uzatish uchun helper
   static Route route(ForgotPasswordBloc bloc) {
     return MaterialPageRoute(
       builder: (_) => BlocProvider.value(
@@ -77,7 +73,6 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
                           ),
                     ),
                     const SizedBox(height: 32),
-                    // New Password
                     Text(
                       'New Password',
                       style: Theme.of(context).textTheme.labelMedium?.copyWith(fontWeight: FontWeight.w500),
@@ -98,7 +93,6 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
                       ),
                     ),
                     const SizedBox(height: 16),
-                    // Confirm Password
                     Text(
                       'Confirm Password',
                       style: Theme.of(context).textTheme.labelMedium?.copyWith(fontWeight: FontWeight.w500),

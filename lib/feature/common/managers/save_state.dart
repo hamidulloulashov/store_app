@@ -1,6 +1,6 @@
 import 'package:equatable/equatable.dart';
 
-import '../../../data/model/home_model.dart/product_model.dart';
+import '../../../data/model/home/product_model.dart';
 
 class SavedState extends Equatable {
   final String? errorMessage;

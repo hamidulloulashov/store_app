@@ -69,6 +69,12 @@ class ProductModel {
     );
   }
 
+  get name => null;
+
+  get description => null;
+
+  get category => null;
+
   Map<String, dynamic> toJson() => {
         'id': id,
         'categoryId': categoryId,

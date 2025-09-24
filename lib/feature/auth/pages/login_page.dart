@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
-import 'package:store_app/feature/auth/managers/aut/login_event.dart';
-import 'package:store_app/feature/auth/managers/aut/login_state.dart';
+import 'package:store_app/feature/auth/managers/login/login_event.dart';
+import 'package:store_app/feature/auth/managers/login/login_state.dart';
 import 'package:store_app/feature/common/widget/custom_appbar.dart';
-import '../managers/aut/login_bloc.dart'; // Bu faylda hamma narsa bor
+import '../managers/login/login_bloc.dart'; // Bu faylda hamma narsa bor
 import '../widgets/register_widget.dart.dart';
 
 class LoginPage extends StatefulWidget {

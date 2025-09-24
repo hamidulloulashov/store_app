@@ -2,8 +2,8 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:store_app/data/model/auth/register_model.dart' show RegisterModel;
 import 'package:store_app/data/repostories/auth_repostoriya.dart' show RegisterRepository;
-import 'package:store_app/feature/auth/managers/aut/register_event.dart' show RegisterEvent, RegisterSubmitted, RegisterClearError, RegisterClearState;
-import 'package:store_app/feature/auth/managers/aut/register_state.dart' show RegisterState;
+import 'package:store_app/feature/auth/managers/register/register_event.dart' show RegisterEvent, RegisterSubmitted, RegisterClearError, RegisterClearState;
+import 'package:store_app/feature/auth/managers/register/register_state.dart' show RegisterState;
 
 import '../../../../core/lokal_data_storege/token_storage.dart';
 

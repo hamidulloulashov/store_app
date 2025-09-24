@@ -8,5 +8,8 @@ class Routes {
   static const home = "/home";
    static const notification = '/notification'; 
    static const save = "/save";
-   
+   static const profile = "/profile";
+   static const cart = "/cart";
+   static const search = "/search";
+
 }

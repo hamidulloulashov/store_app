@@ -1,6 +1,6 @@
 
 import 'package:equatable/equatable.dart';
-import 'package:store_app/data/model/home_model.dart/product_model.dart' show ProductModel;
+import 'package:store_app/data/model/home/product_model.dart' show ProductModel;
 
 abstract class SavedEvent extends Equatable {
   const SavedEvent();
