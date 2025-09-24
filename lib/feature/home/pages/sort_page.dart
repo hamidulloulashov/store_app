@@ -9,7 +9,6 @@ class FilterBottomSheet extends StatefulWidget {
   final double? currentMinPrice;
   final double? currentMaxPrice;
   final String? currentOrderBy;
-
   const FilterBottomSheet({
     Key? key,
     this.currentCategoryId,
@@ -33,7 +32,6 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
   final List<String> _sortOptions = ['relevance', 'price_low_high', 'price_high_low'];
   final List<String> _sizes = ['XS', 'S', 'M', 'L', 'XL', 'XXL'];
   final List<String> _categories = ['T-Shirt', 'Polo', 'Hoodie', 'Jacket'];
-
   @override
   void initState() {
     super.initState();

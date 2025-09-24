@@ -5,16 +5,20 @@ import 'package:store_app/data/repostories/card_repository.dart';
 import 'package:store_app/feature/card/managers/card_bloc.dart';
 import 'package:store_app/feature/card/managers/card_event.dart';
 import 'package:store_app/feature/card/managers/card_state.dart';
+import 'package:store_app/feature/common/widget/custom_appbar.dart';
 class MyCartPage extends StatelessWidget {
   const MyCartPage({super.key});
-
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
       create: (_) => CartBloc(CartRepository(apiClient: context.read<ApiClient>()))
         ..add(LoadCart()),
       child: Scaffold(
-        appBar: AppBar(title: const Text("My Cart")),
+        appBar: CustomAppBar(
+          title:"My Cart",
+          arrow: "assets/arrow.png",
+          first: "assets/notifaction.png",
+        ),
         body: BlocBuilder<CartBloc, CartState>(
           builder: (context, state) {
             if (state is CartLoading) return const Center(child: CircularProgressIndicator());
@@ -89,7 +93,33 @@ class MyCartPage extends StatelessWidget {
               const Divider(),
               _row("Total", "\$${state.cart.total}", bold: true),
               const SizedBox(height: 12),
-              ElevatedButton(onPressed: () {}, child: const Text("Go To Checkout")),
+ElevatedButton(
+  style: ElevatedButton.styleFrom(
+    backgroundColor: Theme.of(context).colorScheme.onSurface,  
+    padding: const EdgeInsets.symmetric(vertical: 14),
+    shape: RoundedRectangleBorder(
+      borderRadius: BorderRadius.circular(8),
+    ),
+  ),
+  onPressed: () {},
+  child: Row(
+    mainAxisAlignment: MainAxisAlignment.center,
+    children: [
+       Text(
+        "Go To Checkout ",
+        style: TextStyle(fontSize: 15, color: Theme.of(context).colorScheme.onErrorContainer, ), 
+      ),
+      const SizedBox(width: 10),
+      Image.asset(
+        "assets/arrow2.png",
+        width: 14,
+        height: 14,
+        color: Theme.of(context).colorScheme.onErrorContainer,
+      ),
+    ],
+  ),
+),
+
             ],
           ),
         ),

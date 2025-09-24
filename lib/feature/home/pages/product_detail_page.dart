@@ -60,7 +60,6 @@ class _ProductDetailWithReviewsPageState
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    /// --- Product Image ---
                     Stack(
                       children: [
                         ClipRRect(
@@ -105,7 +104,6 @@ class _ProductDetailWithReviewsPageState
                     _buildProductRating(context, product),
                     const SizedBox(height: 20),
 
-                    /// --- Size tanlash ---
                     const Text("Choose size:"),
                     const SizedBox(height: 8),
                     Wrap(
@@ -217,7 +215,6 @@ class _ProductDetailWithReviewsPageState
     );
   }
 
-  /// ⭐ Rating builder
   Widget _buildProductRating(BuildContext context, dynamic product) {
     return Row(
       children: [

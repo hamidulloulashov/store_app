@@ -14,45 +14,37 @@ import 'package:store_app/feature/home/managers/home/product_bloc.dart';
 import 'package:store_app/feature/search/managers/search_bloc.dart';
 import 'client.dart';
 
-/// 🔑 ApiClient provider
 final apiClientProvider = Provider<ApiClient>(create: (_) => ApiClient());
 
-/// 🔑 Product repository
 final productRepoProvider = Provider<homeRepo.ProductRepository>(
   create: (context) => homeRepo.ProductRepositoryImpl(context.read<ApiClient>()),
 );
 
-/// 🔑 Sort repository
 final sortRepoProvider = Provider<sortRepo.SortRepository>(
   create: (context) => sortRepo.ProductRepositoryImpl(context.read<ApiClient>()),
 );
 
-/// 🔑 Saved products repository
 final savedRepoProvider = Provider<ProductRepositories>(
   create: (context) => ProductRepositories(context.read<ApiClient>()),
 );
 
-/// 🔑 Search repository
 final searchRepoProvider = Provider<SearchRepository>(
   create: (context) => SearchRepository(),
 );
 
-/// 🔑 ✅ Cart repository  (⟵ shu yo‘q edi)
 final cartRepoProvider = Provider<CartRepository>(
   create: (context) => CartRepository(apiClient: context.read<ApiClient>()),
 );
 
 
-/// Barcha dependencylar
 final List<SingleChildWidget> dependencies = [
   apiClientProvider,
   productRepoProvider,
   sortRepoProvider,
   savedRepoProvider,
   searchRepoProvider,
-  cartRepoProvider, // ✅ endi mavjud
+  cartRepoProvider, 
      Provider(create: (_) => ApiClient()),
-  // Bloc lar
   BlocProvider<ThemeBloc>(create: (_) => ThemeBloc()),
   BlocProvider<SavedBloc>(
     create: (context) =>
@@ -67,7 +59,6 @@ final List<SingleChildWidget> dependencies = [
   ),
   BlocProvider<ForgotPasswordBloc>(create: (_) => ForgotPasswordBloc()),
 
-  /// ✅ CartBloc
   BlocProvider<CartBloc>(
     create: (context) => CartBloc(context.read<CartRepository>()),
   ),

@@ -1,35 +1,57 @@
 class CartItem {
   final int id;
-  final int productId;
   final String title;
-  final String size;
-  final int sizeId; 
-  final double price;
   final String image;
+  final String size;
+  final double price;
   final int quantity;
+
   CartItem({
     required this.id,
-    required this.productId,
     required this.title,
-    required this.size,
-    required this.sizeId, 
-    required this.price,
     required this.image,
+    required this.size,
+    required this.price,
     required this.quantity,
   });
-  factory CartItem.fromJson(Map<String, dynamic> json) {
+
+  CartItem copyWith({
+    int? id,
+    String? title,
+    String? image,
+    String? size,
+    double? price,
+    int? quantity,
+  }) {
     return CartItem(
-      id: json['id'] ?? 0,
-      productId: json['productId'] ?? 0,
-      title: json['title'] ?? '',
-      size: json['size']?.toString() ?? '',
-      sizeId: json['sizeId'] ?? 0,
-      price: (json['price'] as num?)?.toDouble() ?? 0.0,
-      image: json['image'] ?? '',
-      quantity: json['quantity'] ?? 0,
+      id: id ?? this.id,
+      title: title ?? this.title,
+      image: image ?? this.image,
+      size: size ?? this.size,
+      price: price ?? this.price,
+      quantity: quantity ?? this.quantity,
     );
   }
+
+  factory CartItem.fromJson(Map<String, dynamic> json) => CartItem(
+        id: json['id'],
+        title: json['title'],
+        image: json['image'],
+        size: json['size'],
+        price: (json['price'] as num).toDouble(),
+        quantity: json['quantity'],
+      );
+
+  Map<String, dynamic> toJson() => {
+        'id': id,
+        'title': title,
+        'image': image,
+        'size': size,
+        'price': price,
+        'quantity': quantity,
+      };
 }
+
 class CartModel {
   final List<CartItem> items;
   final double subTotal;
@@ -45,17 +67,37 @@ class CartModel {
     required this.total,
   });
 
-  factory CartModel.fromJson(Map<String, dynamic> json) {
-    final list = (json['items'] as List<dynamic>?)
-            ?.map((e) => CartItem.fromJson(e))
-            .toList() ??
-        [];
+  CartModel copyWith({
+    List<CartItem>? items,
+    double? subTotal,
+    double? vat,
+    double? shippingFee,
+    double? total,
+  }) {
     return CartModel(
-      items: list,
-      subTotal: (json['subTotal'] as num?)?.toDouble() ?? 0.0,
-      vat: (json['vat'] as num?)?.toDouble() ?? 0.0,
-      shippingFee: (json['shippingFee'] as num?)?.toDouble() ?? 0.0,
-      total: (json['total'] as num?)?.toDouble() ?? 0.0,
+      items: items ?? this.items,
+      subTotal: subTotal ?? this.subTotal,
+      vat: vat ?? this.vat,
+      shippingFee: shippingFee ?? this.shippingFee,
+      total: total ?? this.total,
     );
   }
+
+  factory CartModel.fromJson(Map<String, dynamic> json) => CartModel(
+        items: (json['items'] as List)
+            .map((e) => CartItem.fromJson(e))
+            .toList(),
+        subTotal: (json['subTotal'] as num).toDouble(),
+        vat: (json['vat'] as num).toDouble(),
+        shippingFee: (json['shippingFee'] as num).toDouble(),
+        total: (json['total'] as num).toDouble(),
+      );
+
+  Map<String, dynamic> toJson() => {
+        'items': items.map((e) => e.toJson()).toList(),
+        'subTotal': subTotal,
+        'vat': vat,
+        'shippingFee': shippingFee,
+        'total': total,
+      };
 }
