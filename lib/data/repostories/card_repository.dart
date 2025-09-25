@@ -45,5 +45,4 @@ class CartRepository {
     return Result.error(Exception('Failed to remove item from cart: $e'));
   }
 }
-
 }

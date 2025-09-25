@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 import 'package:store_app/data/model/home/product_model.dart';
 import 'package:store_app/data/model/home/review_model.dart';
 import 'package:store_app/data/repostories/home_repostrory.dart';
@@ -157,10 +158,11 @@ class _ProductDetailWithReviewsPageState
                                     ),
                                   );
 
-                              Navigator.of(context).push(
-                                MaterialPageRoute(
-                                    builder: (_) => const MyCartPage()),
-                              );
+                              // Navigator.of(context).push(
+                              //   MaterialPageRoute(
+                              //       builder: (_) => const MyCartPage()),
+                              // );
+                              GoRouter.of(context).push("/mycart");
                             },
                             icon: const Icon(Icons.shopping_cart_outlined),
                             label: const Text("Add to Cart"),
@@ -173,7 +175,6 @@ class _ProductDetailWithReviewsPageState
                     const Divider(),
                     const SizedBox(height: 10),
 
-                    /// --- Reviews ---
                     const Text("Reviews",
                         style: TextStyle(
                             fontSize: 18, fontWeight: FontWeight.bold)),

@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:store_app/feature/auth/pages/login_page.dart';
+import 'package:go_router/go_router.dart';
+import 'package:store_app/core/router/routes.dart' show Routes;
 import 'package:store_app/feature/common/widget/bottom_navigator.dart';
 import 'package:store_app/feature/common/widget/custom_appbar.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:store_app/feature/profile/pages/help_center_page.dart';
 
 class TokenStorage {
   static const _key = "token_storage";
@@ -22,7 +24,6 @@ class TokenStorage {
     await prefs.remove(_key);
   }
 }
-
 class ProfilePage extends StatelessWidget {
   const ProfilePage({super.key});
 
@@ -32,6 +33,7 @@ class ProfilePage extends StatelessWidget {
       appBar: CustomAppBar(
         title: "Account",
         arrow: "assets/arrow.png",
+        first: "assets/notifaction.png",
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -83,21 +85,28 @@ class ProfilePage extends StatelessWidget {
                     icon: Icons.notifications_outlined,
                     title: "Notifications",
                     textColor: Theme.of(context).colorScheme.onSurface,
-                    onTap: () {},
+                    onTap: () {
+                        context.push('/notifactions');
+                    },
                   ),
                   _buildDivider(),
                   _buildProfileItem(
                     icon: Icons.help_outline,
                     title: "FAQs",
                     textColor: Theme.of(context).colorScheme.onSurface,
-                    onTap: () {},
+                    onTap: () {
+                      context.push("/faqs");
+                    },
                   ),
                   _buildDivider(),
                   _buildProfileItem(
                     icon: Icons.support_agent_outlined,
                     title: "Help Center",
                     textColor: Theme.of(context).colorScheme.onSurface,
-                    onTap: () {},
+                    onTap: () {
+  context.push('/help');
+
+                    },
                   ),
                 ],
               ),
@@ -176,10 +185,9 @@ class ProfilePage extends StatelessWidget {
 
   Widget _buildDivider() {
     return Divider(
-      height: 1,
-      thickness: 1,
+      height: 9,
+      thickness: 2,
       color: Colors.grey[200],
-      indent: 56,
     );
   }
 
@@ -300,56 +308,29 @@ class ProfilePage extends StatelessWidget {
   }
 
   void _performLogout(BuildContext context) async {
-    if (!context.mounted) return;
+  if (!context.mounted) return;
 
-    // Show loading indicator
-    showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder: (BuildContext dialogContext) {
-        return const Center(
-          child: CircularProgressIndicator(),
-        );
-      },
-    );
+  showDialog(
+    context: context,
+    barrierDismissible: false,
+    builder: (_) => const Center(child: CircularProgressIndicator()),
+  );
 
-    try {
-      // Clear token
-      await TokenStorage.clearToken();
-      
-      // Clear all SharedPreferences data
-      final prefs = await SharedPreferences.getInstance();
-      await prefs.clear();
+  try {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.clear();
 
-      // Debug prints
-      String? remainingToken = await TokenStorage.getToken();
-      print('Token cleared: ${remainingToken == null}');
-      print('Starting navigation to login...');
 
-      if (!context.mounted) return;
 
-      // Close loading dialog
-      Navigator.pop(context);
+    if (context.mounted) Navigator.pop(context);
 
-      // Navigate to login page and clear all routes
-      Navigator.of(context).pushAndRemoveUntil(
-        MaterialPageRoute(builder: (context) => const LoginPage()),
-        (Route<dynamic> route) => false,
-      );
-      
-      print('Navigation completed');
-      
-    } catch (e) {
-      print('Logout error: $e');
-      
-      if (context.mounted) {
-        Navigator.pop(context); 
-        
-        Navigator.of(context).pushAndRemoveUntil(
-          MaterialPageRoute(builder: (context) => const LoginPage()),
-          (Route<dynamic> route) => false,
-        );
-      }
-    }
+    if (context.mounted) context.go(Routes.login);
+
+  } catch (e) {
+    print('Logout error: $e');
+    if (context.mounted) Navigator.pop(context);
+    if (context.mounted) context.go(Routes.login);
   }
+}
+
 }

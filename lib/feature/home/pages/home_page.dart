@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:speech_to_text/speech_to_text.dart' as stt;
+import 'package:store_app/core/router/routes.dart' show Routes;
 import 'package:store_app/feature/common/widget/bottom_navigator.dart';
 import 'package:store_app/feature/common/widget/custom_appbar.dart';
 import 'package:store_app/feature/home/pages/sort_page.dart' show FilterBottomSheet;
@@ -12,6 +13,8 @@ import '../../../data/repostories/home_repostrory.dart';
 import '../managers/home/product_bloc.dart';
 import '../managers/home/product_event.dart';
 import '../managers/home/product_state.dart';
+import '../pages/product_detail_page.dart';
+
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
   @override
@@ -93,79 +96,68 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
- Widget _buildSearchField() {
-  return Padding(
-    padding: const EdgeInsets.all(12.0),
-    child: Row(
-      children: [
-        Expanded(
-          child: GestureDetector(
-            onTap: () {
-  final bloc = context.read<ProductBloc>();
-  context.push(
-    '/search',
-    extra: {
-      'bloc': bloc,
-      'allProducts': _allProducts,
-    },
-  );
-},
-
-            child: AbsorbPointer(
-              child: TextField(
-                controller: _controller,
-                decoration: InputDecoration(
-                  hintText: "Search for clothes...",
-                  hintStyle: TextStyle(
-                      color: Theme.of(context).colorScheme.onSecondary),
-                  prefixIcon: const Icon(Icons.search),
-                  prefixIconColor:
-                      Theme.of(context).colorScheme.onSecondary,
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
+  Widget _buildSearchField() {
+    return Padding(
+      padding: const EdgeInsets.all(12.0),
+      child: Row(
+        children: [
+          Expanded(
+            child: GestureDetector(
+              onTap: () {
+                final bloc = context.read<ProductBloc>();
+                context.push(
+                  '/search',
+                  extra: {'bloc': bloc, 'allProducts': _allProducts},
+                );
+              },
+              child: AbsorbPointer(
+                child: TextField(
+                  controller: _controller,
+                  decoration: InputDecoration(
+                    hintText: "Search for clothes...",
+                    hintStyle: TextStyle(color: Theme.of(context).colorScheme.onSecondary),
+                    prefixIcon: const Icon(Icons.search),
+                    prefixIconColor: Theme.of(context).colorScheme.onSecondary,
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    filled: true,
+                    fillColor: Colors.grey[100],
                   ),
-                  filled: true,
-                  fillColor: Colors.grey[100],
                 ),
               ),
             ),
           ),
-        ),
-        const SizedBox(width: 8),
-        GestureDetector(
-          onTap: ()async{
-            final bloc = context.read<ProductBloc>();
-            await showModalBottomSheet(
-  context: context,
-  isScrollControlled: true,
-  builder: (context) => BlocProvider.value(
-    value: bloc, 
-    child: FilterBottomSheet(
-      currentCategoryId: null,
-      currentSizeId: null,
-      currentTitle: null,
-      currentMinPrice: null,
-      currentMaxPrice: null,
-      currentOrderBy: null,
-    ),
-  ),
-);
-
-
-          },
-          child: Image.asset(
-            'assets/sort.png',
-            width: 36,
-            height: 36,
+          const SizedBox(width: 8),
+          GestureDetector(
+            onTap: () async {
+              final bloc = context.read<ProductBloc>();
+              await showModalBottomSheet(
+                context: context,
+                isScrollControlled: true,
+                builder: (context) => BlocProvider.value(
+                  value: bloc,
+                  child: FilterBottomSheet(
+                    currentCategoryId: null,
+                    currentSizeId: null,
+                    currentTitle: null,
+                    currentMinPrice: null,
+                    currentMaxPrice: null,
+                    currentOrderBy: null,
+                  ),
+                ),
+              );
+            },
+            child: Image.asset(
+              'assets/sort.png',
+              width: 36,
+              height: 36,
+            ),
           ),
-        ),
-      ],
-    ),
-  );
-}
-
-
-
+        ],
+      ),
+    );
+  }
 
   Widget _buildCategories(ProductState state) {
     return SizedBox(
@@ -178,34 +170,14 @@ class _HomePageState extends State<HomePage> {
           final cat = state.categories[index];
           final isSelected = state.selectedCategoryId == cat.id;
 
-          return Container(
-            margin: const EdgeInsets.only(right: 8),
-            child: ChoiceChip(
-              label: Text(
-                cat.title,
-                style: TextStyle(
-                  color: isSelected ? Colors.white : Colors.black,
-                  fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
-                ),
-              ),
-              selected: isSelected,
-              onSelected: (_) {
-                _controller.clear();
-                context
-                    .read<ProductBloc>()
-                    .add(ChangeCategoryEvent(cat.id, _allProducts));
-              },
-              showCheckmark: false,
-              selectedColor: Colors.black,
-              backgroundColor: Colors.white,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(8),
-                side: BorderSide(
-                  color: isSelected ? Colors.black : Colors.grey.shade300,
-                ),
-              ),
-            ),
-          );
+          return Container( margin: const EdgeInsets.only(right: 8), 
+          child: ChoiceChip( label: Text( cat.title, style: 
+          TextStyle( color: isSelected ? Theme.of(context).colorScheme.onErrorContainer : 
+          Theme.of(context).colorScheme.onSurface, fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+           ), ), selected: isSelected, onSelected: (_) { _controller.clear(); context .read<ProductBloc>() .add(
+            ChangeCategoryEvent(cat.id, _allProducts)); }, showCheckmark: false, selectedColor: Theme.of(context).colorScheme.onSurface, backgroundColor: Theme.of(context).colorScheme.primary, 
+            shape: RoundedRectangleBorder( borderRadius: BorderRadius.circular(8),
+             side: BorderSide( color: isSelected ? Theme.of(context).colorScheme.onSurface : Theme.of(context).colorScheme.inverseSurface, ), ), ), );
         },
       ),
     );
@@ -233,7 +205,13 @@ class _HomePageState extends State<HomePage> {
                   itemCount: state.products.length,
                   itemBuilder: (context, index) {
                     final product = state.products[index];
-                    return ProductCard(product: product);
+                    return GestureDetector(
+                      onTap: () {
+                      context.push('${Routes.detail}/${product.id}');
+
+                      },
+                      child: ProductCard(product: product),
+                    );
                   },
                 ),
     );

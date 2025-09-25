@@ -5,10 +5,10 @@ import 'package:store_app/data/repostories/notifaction_repositoriya.dart';
 import 'package:store_app/feature/common/widget/bottom_navigator.dart';
 import 'package:store_app/feature/common/widget/custom_appbar.dart';
 import 'package:store_app/feature/common/widget/epmty_widget.dart';
-import 'package:store_app/feature/notifacton/managers/notifaction_state.dart' show NotificationState, NotificationLoading, NotificationError, NotificationLoaded;
 import '../managers/date_helpr.dart';
 import '../managers/notifaction_bloc.dart';
 import '../managers/notifaction_event.dart';
+import '../managers/notifaction_state.dart';
 
 class NotificationPage extends StatelessWidget {
   const NotificationPage({super.key});
@@ -59,8 +59,7 @@ class NotificationPage extends StatelessWidget {
                         notif.icon,
                         height: 32,
                         width: 32,
-                        placeholderBuilder: (context) =>
-                            const CircularProgressIndicator(),
+                        placeholderBuilder: (context) => const CircularProgressIndicator(),
                       ),
                       title: Text(
                         notif.title,
@@ -68,8 +67,7 @@ class NotificationPage extends StatelessWidget {
                       ),
                       subtitle: Text(
                         formatNotificationDate(notif.date),
-                        style:
-                            const TextStyle(color: Colors.grey, fontSize: 13),
+                        style: const TextStyle(color: Colors.grey, fontSize: 13),
                       ),
                     ),
                   );

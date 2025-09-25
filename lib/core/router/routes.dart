@@ -1,3 +1,5 @@
+import 'package:flutter/material.dart';
+
 class Routes {
   static const splash = "/splash";
   static const onboarding = "/onboarding";
@@ -11,5 +13,10 @@ class Routes {
    static const profile = "/profile";
    static const cart = "/cart";
    static const search = "/search";
+   static const detail = "/detail";
+   static const mycart = "/mycart";
+   static const help = "/help";
+   static const notifications = "/notifactions";
+   static const faqs = "/faqs";
 
 }

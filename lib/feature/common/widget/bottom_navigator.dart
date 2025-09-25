@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import 'package:store_app/feature/home/managers/home/product_bloc.dart';
 
 class BottomNavigatorNews extends StatelessWidget {
   const BottomNavigatorNews({super.key});
@@ -27,7 +29,13 @@ class BottomNavigatorNews extends StatelessWidget {
       context.push('/home');   
       break;
     case 1:
-      context.push('/search');
+      context.push(
+        '/search',
+        extra: {
+          'allProducts': context.read<ProductBloc>().state.products,
+          'bloc': context.read<ProductBloc>(),
+        },
+      );
       break;
     case 2:
       context.push('/save');
@@ -40,7 +48,6 @@ class BottomNavigatorNews extends StatelessWidget {
       break;
   }
 }
-
 
   @override
   Widget build(BuildContext context) {
