@@ -15,7 +15,7 @@ class ReviewModel {
     return ReviewModel(
       id: json['id'] as int,
       comment: json['comment'] as String,
-      rating: (json['rating'] as num).toDouble(), // 🔹 double ga aniq aylantirish
+      rating: (json['rating'] as num).toDouble(), 
       created: DateTime.parse(json['created']),
       userFullName: json['userFullName'] as String,
     );

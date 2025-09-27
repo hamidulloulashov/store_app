@@ -1,4 +1,3 @@
-import 'package:flutter/material.dart';
 
 class Routes {
   static const splash = "/splash";
@@ -18,5 +17,7 @@ class Routes {
    static const help = "/help";
    static const notifications = "/notifactions";
    static const faqs = "/faqs";
+   static const payment  = "/payment";
+   static const payment_new = "/payment_new";
 
 }

@@ -15,6 +15,8 @@ import 'package:store_app/feature/auth/pages/onboarding_page.dart';
 import 'package:store_app/feature/auth/pages/splash_page.dart';
 import 'package:store_app/feature/home/pages/product_detail_page.dart';
 import 'package:store_app/feature/notifacton/pages/notifacton_page.dart';
+import 'package:store_app/feature/payment/pages/payment_new_page.dart';
+import 'package:store_app/feature/payment/pages/payment_page.dart';
 import 'package:store_app/feature/profile/pages/faqs_page.dart';
 import 'package:store_app/feature/profile/pages/help_center_page.dart';
 import 'package:store_app/feature/profile/pages/notifactions_page.dart';
@@ -43,6 +45,10 @@ import 'package:store_app/feature/search/pages/search_page.dart';
         path: Routes.help,
         builder: (context, state) => HelpCenterPage(),
       ),
+         GoRoute(
+        path: Routes.payment_new,
+        builder: (context, state) => PaymentNewPage(),
+      ),
            GoRoute(
         path: Routes.notifications,
         builder: (context, state) => NotificationsPage(),
@@ -70,6 +76,10 @@ import 'package:store_app/feature/search/pages/search_page.dart';
                          GoRoute(
         path: Routes.notification,
         builder: (context, state) => NotificationPage(),
+      ),
+                      GoRoute(
+        path: Routes.payment,
+        builder: (context, state) => PaymentPage(),
       ),
                                GoRoute(
         path: Routes.save,
@@ -122,8 +132,6 @@ import 'package:store_app/feature/search/pages/search_page.dart';
     );
   },
 ),
-
-    
     ],
   );
 

@@ -4,7 +4,6 @@ import 'package:store_app/core/router/routes.dart' show Routes;
 import 'package:store_app/feature/common/widget/bottom_navigator.dart';
 import 'package:store_app/feature/common/widget/custom_appbar.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:store_app/feature/profile/pages/help_center_page.dart';
 
 class TokenStorage {
   static const _key = "token_storage";
@@ -78,7 +77,9 @@ class ProfilePage extends StatelessWidget {
                     icon: Icons.credit_card_outlined,
                     title: "Payment Methods",
                     textColor: Theme.of(context).colorScheme.onSurface,
-                    onTap: () {},
+                    onTap: () {
+                      context.push("/payment");
+                    },
                   ),
                   _buildDivider(),
                   _buildProfileItem(
