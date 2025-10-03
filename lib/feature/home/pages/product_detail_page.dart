@@ -6,7 +6,7 @@ import 'package:store_app/data/model/home/review_model.dart';
 import 'package:store_app/data/repostories/home_repostrory.dart';
 import 'package:store_app/feature/card/managers/card_bloc.dart' show CartBloc;
 import 'package:store_app/feature/card/managers/card_event.dart';
-import 'package:store_app/feature/card/pages/my_card_page.dart';
+import 'package:store_app/feature/card/pages/my_cart_page.dart';
 import 'package:store_app/feature/common/widget/custom_appbar.dart';
 import 'package:store_app/feature/common/widget/favourite_wigdet.dart';
 import 'package:store_app/feature/home/managers/product_detail/product_detail_bloc.dart';
@@ -158,10 +158,7 @@ class _ProductDetailWithReviewsPageState
                                     ),
                                   );
 
-                              // Navigator.of(context).push(
-                              //   MaterialPageRoute(
-                              //       builder: (_) => const MyCartPage()),
-                              // );
+                           
                               GoRouter.of(context).push("/mycart");
                             },
                             icon: const Icon(Icons.shopping_cart_outlined),

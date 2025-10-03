@@ -7,7 +7,8 @@ import 'package:store_app/feature/auth/pages/forgot_pasword.dart';
 import 'package:store_app/feature/auth/pages/login_page.dart';
 import 'package:store_app/feature/auth/pages/register_page.dart';
 import 'package:store_app/feature/auth/pages/reset_password_page.dart';
-import 'package:store_app/feature/card/pages/my_card_page.dart';
+import 'package:store_app/feature/card/pages/my_cart_page.dart';
+import 'package:store_app/feature/checout/pages/checout_page.dart';
 import 'package:store_app/feature/common/page/save_page.dart';
 import 'package:store_app/feature/home/managers/home/product_bloc.dart';
 import 'package:store_app/feature/home/pages/home_page.dart';
@@ -15,125 +16,155 @@ import 'package:store_app/feature/auth/pages/onboarding_page.dart';
 import 'package:store_app/feature/auth/pages/splash_page.dart';
 import 'package:store_app/feature/home/pages/product_detail_page.dart';
 import 'package:store_app/feature/notifacton/pages/notifacton_page.dart';
+import 'package:store_app/feature/order/pages/my_order_page.dart';
 import 'package:store_app/feature/payment/pages/payment_new_page.dart';
 import 'package:store_app/feature/payment/pages/payment_page.dart';
 import 'package:store_app/feature/profile/pages/faqs_page.dart';
 import 'package:store_app/feature/profile/pages/help_center_page.dart';
 import 'package:store_app/feature/profile/pages/notifactions_page.dart';
 import 'package:store_app/feature/profile/pages/profile_page.dart';
+import 'package:store_app/feature/profile_update/pages/profile_update_page.dart';
 import 'package:store_app/feature/search/pages/search_page.dart';
- final GoRouter router = GoRouter(
-    initialLocation: Routes.home,
-    routes: [
-      GoRoute(
-        path: Routes.splash,
-        builder: (context, state) => SplashPage(),
-      ),
-           GoRoute(
-        path: Routes.reset,
-        builder: (context, state) => ResetPasswordPage(),
-      ),
-          GoRoute(
-        path: Routes.faqs,
-        builder: (context, state) => FaqsPage(),
-      ),
-          GoRoute(
-        path: Routes.onboarding,
-        builder: (context, state) => OnboardingPage(),
-      ),
-          GoRoute(
-        path: Routes.help,
-        builder: (context, state) => HelpCenterPage(),
-      ),
-         GoRoute(
-        path: Routes.payment_new,
-        builder: (context, state) => PaymentNewPage(),
-      ),
-           GoRoute(
-        path: Routes.notifications,
-        builder: (context, state) => NotificationsPage(),
-      ),
-           GoRoute(
-        path: Routes.mycart,
-        builder: (context, state) => MyCartPage(),
-      ),
-               GoRoute(
-        path: Routes.register,
-        builder: (context, state) => RegisterPage(),
-      ),
-                GoRoute(
-        path: Routes.login,
-        builder: (context, state) => LoginPage(),
-      ),
-                  GoRoute(
-        path: Routes.forgot_password,
-        builder: (context, state) => ForgotPasswordPage(),
-      ),
-                       GoRoute(
-        path: Routes.home,
-        builder: (context, state) => HomePage(),
-      ),
-                         GoRoute(
-        path: Routes.notification,
-        builder: (context, state) => NotificationPage(),
-      ),
-                      GoRoute(
-        path: Routes.payment,
-        builder: (context, state) => PaymentPage(),
-      ),
-                               GoRoute(
-        path: Routes.save,
-        builder: (context, state) => SavedPage(),
-      ),
-                                    GoRoute(
-        path: Routes.profile,
-        builder: (context, state) => ProfilePage(),
-      ),
-                                    GoRoute(
-        path: Routes.cart,
-        builder: (context, state) => MyCartPage(),
-      ),
-                                          GoRoute(
-  path: '${Routes.detail}/:id',
-  builder: (context, state) {
-    final productId = int.parse(state.pathParameters['id']!);
-    return ProductDetailWithReviewsPage(productId: productId);
-  },
-),
 
+final GoRouter router = GoRouter(
+  initialLocation: Routes.order,
+  routes: [
+    GoRoute(
+      path: Routes.splash,
+      builder: (context, state) => SplashPage(),
+    ),
+     GoRoute(
+      path: Routes.order,
+      builder: (context, state) => MyOrdersPage(),
+    ),
+    GoRoute(
+      path: Routes.reset,
+      builder: (context, state) => ResetPasswordPage(),
+    ),
+    GoRoute(
+      path: Routes.checout,
+      builder: (context, state) {
+        final extra = state.extra;
+        
+        if (extra == null || extra is! Map<String, dynamic>) {
+          return const Scaffold(
+            body: Center(child: Text("No checkout data provided")),
+          );
+        }
 
-                                         GoRoute(
-  path: Routes.search,
-  builder: (context, state) {
-    final extra = state.extra;
-    
-    if (extra == null || extra is! Map<String, dynamic>) {
-      return const Scaffold(
-        body: Center(child: Text("No data provided")),
-      );
-    }
+        final subTotal = extra['subTotal'] as double? ?? 0.0;
+        final vat = extra['vat'] as double? ?? 0.0;
+        final shippingFee = extra['shippingFee'] as double? ?? 0.0;
+        final total = extra['total'] as double? ?? 0.0;
 
-    final allProducts = extra['allProducts'] as List<ProductModel>? ?? [];
-    final productBloc = extra['bloc'] as ProductBloc?;
-
-    if (productBloc == null) {
-      return const Scaffold(
-        body: Center(child: Text("Bloc is missing")),
-      );
-    }
-
-    return Builder(
-      builder: (context) {
-        return BlocProvider.value(
-          value: productBloc,
-          child: SearchPage(allProducts: allProducts),
+        return CheckoutPage(
+          subTotal: subTotal,
+          vat: vat,
+          shippingFee: shippingFee,
+          total: total,
         );
       },
-    );
-  },
-),
-    ],
-  );
+    ),
+    GoRoute(
+      path: Routes.faqs,
+      builder: (context, state) => FaqsPage(),
+    ),
+    GoRoute(
+      path: Routes.onboarding,
+      builder: (context, state) => OnboardingPage(),
+    ),
+    GoRoute(
+      path: Routes.help,
+      builder: (context, state) => HelpCenterPage(),
+    ),
+    GoRoute(
+      path: Routes.payment_new,
+      builder: (context, state) => PaymentNewPage(),
+    ),
+    GoRoute(
+      path: Routes.notifications,
+      builder: (context, state) => NotificationsPage(),
+    ),
+    GoRoute(
+      path: Routes.mycart,
+      builder: (context, state) => MyCartPage(),
+    ),
+    GoRoute(
+      path: Routes.register,
+      builder: (context, state) => RegisterPage(),
+    ),
+    GoRoute(
+      path: Routes.login,
+      builder: (context, state) => LoginPage(),
+    ),
+    GoRoute(
+      path: Routes.forgot_password,
+      builder: (context, state) => ForgotPasswordPage(),
+    ),
+    GoRoute(
+      path: Routes.home,
+      builder: (context, state) => HomePage(),
+    ),
+    GoRoute(
+      path: Routes.notification,
+      builder: (context, state) => NotificationPage(),
+    ),
+    GoRoute(
+      path: Routes.payment,
+      builder: (context, state) => PaymentPage(),
+    ),
+    GoRoute(
+      path: Routes.update,
+      builder: (context, state) => ProfileUpdatePage(),
+    ),
+    GoRoute(
+      path: Routes.save,
+      builder: (context, state) => SavedPage(),
+    ),
+    GoRoute(
+      path: Routes.profile,
+      builder: (context, state) => ProfilePage(),
+    ),
+    GoRoute(
+      path: Routes.cart,
+      builder: (context, state) => MyCartPage(),
+    ),
+    GoRoute(
+      path: '${Routes.detail}/:id',
+      builder: (context, state) {
+        final productId = int.parse(state.pathParameters['id']!);
+        return ProductDetailWithReviewsPage(productId: productId);
+      },
+    ),
+    GoRoute(
+      path: Routes.search,
+      builder: (context, state) {
+        final extra = state.extra;
+        
+        if (extra == null || extra is! Map<String, dynamic>) {
+          return const Scaffold(
+            body: Center(child: Text("No data provided")),
+          );
+        }
 
+        final allProducts = extra['allProducts'] as List<ProductModel>? ?? [];
+        final productBloc = extra['bloc'] as ProductBloc?;
 
+        if (productBloc == null) {
+          return const Scaffold(
+            body: Center(child: Text("Bloc is missing")),
+          );
+        }
 
+        return Builder(
+          builder: (context) {
+            return BlocProvider.value(
+              value: productBloc,
+              child: SearchPage(allProducts: allProducts),
+            );
+          },
+        );
+      },
+    ),
+  ],
+);

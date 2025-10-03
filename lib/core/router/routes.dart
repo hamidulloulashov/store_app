@@ -19,5 +19,7 @@ class Routes {
    static const faqs = "/faqs";
    static const payment  = "/payment";
    static const payment_new = "/payment_new";
-
+   static const update = "/update";
+   static const checout = "/checout";
+  static const order = "/order";
 }

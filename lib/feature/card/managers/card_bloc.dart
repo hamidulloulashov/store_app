@@ -1,8 +1,7 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:store_app/data/repostories/card_repository.dart' show CartRepository;
+import 'package:store_app/data/repostories/cart_repository.dart' show CartRepository;
 import 'package:store_app/feature/card/managers/card_event.dart';
 import 'package:store_app/feature/card/managers/card_state.dart';
-import 'package:store_app/data/model/card/card_model.dart';
 
 class CartBloc extends Bloc<CartEvent, CartState> {
   final CartRepository repository;

@@ -63,7 +63,9 @@ class ProfilePage extends StatelessWidget {
                     icon: Icons.account_circle_outlined,
                     title: "My Details",
                     textColor: Theme.of(context).colorScheme.onSurface,
-                    onTap: () {},
+                    onTap: () {
+                      context.push("/update");
+                    },
                   ),
                   _buildDivider(),
                   _buildProfileItem(

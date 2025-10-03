@@ -18,7 +18,6 @@ class ApiClient {
           ),
         ) {
     _dio.interceptors.add(AppInterceptor());
-
     _dio.interceptors.add(
       LogInterceptor(
         request: true,
@@ -97,6 +96,27 @@ class ApiClient {
     try {
       final response =
           await _dio.put(path, data: data, queryParameters: queryParams);
+      if (response.statusCode! >= 200 && response.statusCode! < 300) {
+        return Result.ok(response.data as T);
+      } else {
+        return Result.error(Exception("Server error: ${response.statusCode}"));
+      }
+    } on DioException catch (dioError) {
+      return Result.error(Exception(_handleDioError(dioError)));
+    } catch (e) {
+      return Result.error(Exception(e.toString()));
+    }
+  }
+
+  /// ✅ PATCH metodi
+  Future<Result<T>> patch<T>(
+    String path, {
+    dynamic data,
+    Map<String, dynamic>? queryParams,
+  }) async {
+    try {
+      final response =
+          await _dio.patch(path, data: data, queryParameters: queryParams);
       if (response.statusCode! >= 200 && response.statusCode! < 300) {
         return Result.ok(response.data as T);
       } else {

@@ -8,7 +8,12 @@ import 'package:store_app/feature/payment/managers/payment_state.dart';
 import 'package:store_app/feature/payment/pages/payment_new_page.dart';
 import 'package:store_app/data/model/payment_card/payment_card_model.dart';
 class PaymentPage extends StatefulWidget {
-  const PaymentPage({super.key});
+  final int? preSelectedCardId;
+  
+  const PaymentPage({
+    super.key,
+    this.preSelectedCardId,
+  });
 
   @override
   State<PaymentPage> createState() => _PaymentPageState();
@@ -20,6 +25,7 @@ class _PaymentPageState extends State<PaymentPage> {
   @override
   void initState() {
     super.initState();
+    selectedCardId = widget.preSelectedCardId;
     context.read<PaymentBloc>().add(LoadCardsEvent());
   }
 
@@ -35,8 +41,6 @@ class _PaymentPageState extends State<PaymentPage> {
         arrow: "assets/arrow.png",
         first: "assets/notifaction.png",
       ),
-
-      // ASOSIY BODY
       body: Column(
         children: [
           Padding(
@@ -226,8 +230,6 @@ class _PaymentPageState extends State<PaymentPage> {
           ),
         ],
       ),
-
-      // ✅ ASOSIY TUZATISH: Apply tugmasi endi bottomNavigationBar’da
       bottomNavigationBar: SafeArea(
         top: false,
         child: Padding(
@@ -236,7 +238,17 @@ class _PaymentPageState extends State<PaymentPage> {
             width: double.infinity,
             height: 52,
             child: ElevatedButton(
-              onPressed: selectedCardId == null ? null : () {},
+              onPressed: selectedCardId == null 
+                ? null 
+                : () {
+                    final state = context.read<PaymentBloc>().state;
+                    if (state is CardsLoadedState) {
+                      final selectedCard = state.cards.firstWhere(
+                        (card) => card.id == selectedCardId,
+                      );
+                      Navigator.pop(context, selectedCard);
+                    }
+                  },
               style: ElevatedButton.styleFrom(
                 backgroundColor: cs.onSurface,
                 disabledBackgroundColor: cs.primary.withOpacity(0.4),

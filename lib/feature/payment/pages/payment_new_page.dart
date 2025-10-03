@@ -6,6 +6,7 @@ import 'package:store_app/feature/common/widget/custom_appbar.dart';
 import 'package:store_app/feature/payment/managers/payment_bloc.dart';
 import 'package:store_app/feature/payment/managers/payment_event.dart';
 import 'package:store_app/feature/payment/managers/payment_state.dart';
+import 'package:store_app/feature/payment/widgets/sucses_widget.dart' show showSuccessSnackBar;
 
 class PaymentNewPage extends StatefulWidget {
   const PaymentNewPage({super.key});
@@ -31,17 +32,16 @@ class _NewCardScreenState extends State<PaymentNewPage> {
       ),
       body: BlocListener<PaymentBloc, PaymentState>(
         listener: (context, state) {
-          if (state is CardCreatedState) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text(state.message), backgroundColor: Colors.green),
-            );
-            Navigator.pop(context, true);
-          } else if (state is CardErrorState) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text(state.error), backgroundColor: Colors.red),
-            );
-          }
-        },
+  if (state is CardCreatedState) {
+    showSuccessSnackBar(context, "Your new card has been added.");
+    Navigator.pop(context, true);
+  } else if (state is CardErrorState) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(state.error), backgroundColor: Colors.red),
+    );
+  }
+},
+
         child: Padding(
           padding: const EdgeInsets.all(16),
           child: Form(

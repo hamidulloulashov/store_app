@@ -1,13 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 import 'package:store_app/core/client.dart';
-import 'package:store_app/data/repostories/card_repository.dart';
+import 'package:store_app/core/router/routes.dart';
+import 'package:store_app/data/repostories/cart_repository.dart';
 import 'package:store_app/feature/card/managers/card_bloc.dart';
 import 'package:store_app/feature/card/managers/card_event.dart';
 import 'package:store_app/feature/card/managers/card_state.dart';
 import 'package:store_app/feature/common/widget/custom_appbar.dart';
+
 class MyCartPage extends StatelessWidget {
   const MyCartPage({super.key});
+  
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
@@ -40,7 +44,7 @@ class MyCartPage extends StatelessWidget {
           Icon(Icons.shopping_cart_outlined, size: 64, color: Colors.grey),
           SizedBox(height: 16),
           Text("Your Cart Is Empty!"),
-          Text("When you add products, they’ll appear here."),
+          Text("When you add products, they'll appear here."),
         ],
       ),
     );
@@ -93,33 +97,40 @@ class MyCartPage extends StatelessWidget {
               const Divider(),
               _row("Total", "\$${state.cart.total}", bold: true),
               const SizedBox(height: 12),
-ElevatedButton(
-  style: ElevatedButton.styleFrom(
-    backgroundColor: Theme.of(context).colorScheme.onSurface,  
-    padding: const EdgeInsets.symmetric(vertical: 14),
-    shape: RoundedRectangleBorder(
-      borderRadius: BorderRadius.circular(8),
-    ),
-  ),
-  onPressed: () {},
-  child: Row(
-    mainAxisAlignment: MainAxisAlignment.center,
-    children: [
-       Text(
-        "Go To Checkout ",
-        style: TextStyle(fontSize: 15, color: Theme.of(context).colorScheme.onErrorContainer, ), 
-      ),
-      const SizedBox(width: 10),
-      Image.asset(
-        "assets/arrow2.png",
-        width: 14,
-        height: 14,
-        color: Theme.of(context).colorScheme.onErrorContainer,
-      ),
-    ],
-  ),
-),
-
+              ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Theme.of(context).colorScheme.onSurface,  
+                  padding: const EdgeInsets.symmetric(vertical: 14),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                ),
+                onPressed: () {
+                  // Go Router yordamida checkout sahifasiga o'tish
+                  context.go(Routes.checout, extra: {
+                    'subTotal': state.cart.subTotal,
+                    'vat': state.cart.vat,
+                    'shippingFee': state.cart.shippingFee,
+                    'total': state.cart.total,
+                  });
+                },
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                     Text(
+                      "Go To Checkout ",
+                      style: TextStyle(fontSize: 15, color: Theme.of(context).colorScheme.onErrorContainer, ), 
+                    ),
+                    const SizedBox(width: 10),
+                    Image.asset(
+                      "assets/arrow2.png",
+                      width: 14,
+                      height: 14,
+                      color: Theme.of(context).colorScheme.onErrorContainer,
+                    ),
+                  ],
+                ),
+              ),
             ],
           ),
         ),
